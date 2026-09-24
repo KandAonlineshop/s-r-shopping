@@ -1433,6 +1433,17 @@ Payment: ${payment}`;
         orderHistory.push({ date: new Date().toLocaleString('en-PH'), customer: o.fullname, total: '₱' + o.grandTotal.toFixed(2), summary: currentOrderSummary });
         saveOrderHistory();
         
+        // CLEAR + SAVE the cart FIRST — before any clipboard/popup/navigation that
+        // could suspend the page. On mobile, window.open(Messenger) freezes the tab
+        // immediately, so code placed after it may never run.
+        cart = [];
+        selectedLocation = '';
+        locationSelect.value = '';
+        saveCart();
+        updateCartDisplay();
+        clearForm();
+        pendingOrder = null;
+        
         // Auto-copy summary to clipboard
         try {
             await navigator.clipboard.writeText(currentOrderSummary);
@@ -1444,15 +1455,11 @@ Payment: ${payment}`;
         document.getElementById('order-summary-text').textContent = currentOrderSummary;
         summaryModal.classList.add('show');
         
-        // Auto-open Messenger (triggered by this click, so popup blocker allows it)
+        // Auto-open Messenger (triggered by this click, so popup blocker allows it).
+        // The page may suspend right after this — cart is already cleared & saved above.
         try {
             window.open(MESSENGER_LINK, '_blank');
         } catch (e) { console.log('Messenger open failed:', e); }
-        
-        cart = []; selectedLocation = ''; locationSelect.value = '';
-        updateCartDisplay();
-        clearForm();
-        pendingOrder = null;
     });
     
     document.getElementById('close-summary-modal').addEventListener('click', () => { summaryModal.classList.remove('show'); });
