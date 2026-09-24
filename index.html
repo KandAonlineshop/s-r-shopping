@@ -230,6 +230,16 @@
     .form-hint { font-size: 11px; color: var(--muted); margin-top: 4px; }
     .error-text { color: var(--danger); font-size: 12px; margin-top: 4px; display: none; }
     
+    .order-type-options { display: flex; gap: 10px; }
+    .order-type-option {
+        flex: 1; border: 2px solid var(--border); border-radius: 10px; padding: 12px 10px;
+        cursor: pointer; text-align: center; font-size: 14px; font-weight: 600;
+        transition: all 0.15s; background: #fff; color: var(--text);
+    }
+    .order-type-option:hover { border-color: var(--accent); }
+    .order-type-option.selected { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
+    .order-type-option svg { width: 22px; height: 22px; display: block; margin: 0 auto 6px; }
+    
     .cancel-btn {
         flex: 1; background: #f3f4f6; color: var(--text); border: 1px solid var(--border);
         padding: 12px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: background 0.15s;
@@ -279,11 +289,12 @@
         background: #f8fafc; border: 1px solid var(--border); border-radius: 8px;
         padding: 12px; margin: 10px 0; font-size: 12px; white-space: pre-wrap; word-break: break-all;
     }
-    .copy-btn {
-        background: var(--accent-soft); color: var(--accent); border: none; padding: 8px 12px;
-        border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; margin-top: 8px;
+    .auto-copy-note {
+        background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 8px;
+        padding: 10px 12px; font-size: 13px; color: #065f46; margin-bottom: 8px;
+        display: flex; align-items: center; gap: 8px;
     }
-    .copy-btn:hover { background: var(--accent); color: #fff; }
+    .auto-copy-note svg { width: 18px; height: 18px; flex-shrink: 0; color: var(--success); }
     
     .gcash-info { display: none; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 12px; margin-top: 8px; }
     .gcash-info.show { display: block; }
@@ -334,10 +345,6 @@
 </head>
 <body>
     <div class="top-right-buttons">
-        <button class="icon-btn" id="history-btn" title="Order History">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-            Order History
-        </button>
         <button class="icon-btn admin-btn" id="admin-btn" title="Admin Mode">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
             Admin
@@ -365,6 +372,10 @@
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:14px;height:14px;"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                         Add New Product
                     </button>
+                    <button class="icon-btn" id="admin-history-btn" style="position:static;box-shadow:none;background:var(--purple);color:#fff;border-color:var(--purple);">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        Order History
+                    </button>
                     <button class="icon-btn export-btn" id="export-btn" style="position:static;box-shadow:none;">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                         Export Website for GitHub
@@ -383,7 +394,7 @@
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <rect x="1" y="3" width="15" height="13" rx="2" ry="2"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>
                     </svg>
-                    <span><strong>Delivery Schedule:</strong> Every Sunday, 9:00 AM - 12:00 PM only</span>
+                    <span><strong>Delivery Schedule:</strong> Every Sunday, 9:00 AM - 12:00 PM only &nbsp;|&nbsp; <strong>Pick-up</strong> also available — just choose at checkout</span>
                 </div>
                 
                 <div class="search-container">
@@ -408,7 +419,7 @@
                     <div class="cart-breakdown" id="cart-breakdown" style="display:none;">
                         <div class="breakdown-row subtotal"><span>Subtotal:</span><span>₱<span id="subtotal-price">0.00</span></span></div>
                         <div class="breakdown-row service-fee"><span>Service Fee (10%):</span><span>₱<span id="service-fee">0.00</span></span></div>
-                        <div class="breakdown-row delivery-fee"><span>Delivery Fee:</span><span>₱<span id="delivery-fee">0.00</span></span></div>
+                        <div class="breakdown-row delivery-fee"><span id="delivery-fee-label">Delivery Fee:</span><span>₱<span id="delivery-fee">0.00</span></span></div>
                         <div class="breakdown-row grand-total"><span>Grand Total:</span><span>₱<span id="total-price">0.00</span></span></div>
                         <div class="breakdown-row minimum-note" id="minimum-note" style="display:none;"></div>
                     </div>
@@ -426,6 +437,21 @@
         <div class="modal-content">
             <button class="modal-close" id="close-info-modal">&times;</button>
             <h3 style="margin:0 0 20px 0;color:var(--accent);text-align:center;font-size:20px;">Shipping &amp; Order Details</h3>
+            
+            <div class="form-group">
+                <label>Order Type *</label>
+                <div class="order-type-options">
+                    <div class="order-type-option selected" data-order-type="delivery" id="opt-delivery">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13" rx="2" ry="2"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+                        Delivery
+                    </div>
+                    <div class="order-type-option" data-order-type="pickup" id="opt-pickup">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/><path d="M9 11h6"/></svg>
+                        Pick-up
+                    </div>
+                </div>
+            </div>
+            
             <div class="form-group">
                 <label for="fullname">Full Name *</label>
                 <input type="text" id="fullname" placeholder="e.g. Juan Dela Cruz">
@@ -436,7 +462,7 @@
                 <textarea id="address" placeholder="Street, Barangay, City, Province"></textarea>
                 <p class="error-text" id="address-error">Please enter your complete address</p>
             </div>
-            <div class="form-group">
+            <div class="form-group" id="location-group">
                 <label for="location">Delivery Location *</label>
                 <select id="location">
                     <option value="">-- Select your location --</option>
@@ -449,16 +475,16 @@
                 <p class="error-text" id="location-error">Please select your delivery location</p>
             </div>
             <div class="form-group">
-                <label for="phone">Contact Number *</label>
-                <input type="tel" id="phone" placeholder="e.g. 09171234567">
-                <p class="error-text" id="phone-error">Please enter a valid Philippine mobile number</p>
+                <label for="phone">Contact Number * <span style="font-weight:400;color:var(--muted);font-size:12px;">(11 digits, e.g. 09171234567)</span></label>
+                <input type="tel" id="phone" placeholder="09171234567" maxlength="11" inputmode="numeric" pattern="[0-9]{11}">
+                <p class="error-text" id="phone-error">Please enter a valid 11-digit Philippine mobile number (starts with 09)</p>
             </div>
             <div class="form-group">
                 <label for="payment">Mode of Payment *</label>
                 <select id="payment">
                     <option value="">-- Select Payment Method --</option>
                     <option value="GCash">GCash</option>
-                    <option value="Cash">Cash on Delivery</option>
+                    <option value="Cash">Cash on Delivery / Pick-up</option>
                 </select>
                 <p class="error-text" id="payment-error">Please select your payment method</p>
                 <div class="gcash-info" id="gcash-info">
@@ -476,16 +502,35 @@
         </div>
     </div>
     
+    <div class="modal-overlay" id="review-modal">
+        <div class="modal-content wide">
+            <button class="modal-close" id="close-review">&times;</button>
+            <h3 style="margin:0 0 15px 0;color:var(--accent);text-align:center;font-size:20px;">Review Your Order</h3>
+            <div id="review-content"></div>
+            <div class="auto-copy-note" style="margin-top:14px;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+                <span>After confirming, your order is <strong>copied automatically</strong> and Messenger opens — just <strong>paste (Ctrl+V)</strong> and hit send.</span>
+            </div>
+            <div style="display:flex;gap:10px;margin-top:16px;">
+                <button class="cancel-btn" id="review-back">Back (Edit)</button>
+                <button class="proceed-btn" id="review-confirm">Confirm &amp; Send Order</button>
+            </div>
+        </div>
+    </div>
+    
     <div class="modal-overlay" id="summary-modal">
         <div class="modal-content">
             <button class="modal-close" id="close-summary-modal">&times;</button>
-            <h3 style="margin:0 0 15px 0;color:var(--success);text-align:center;font-size:20px;">Order Summary</h3>
-            <p style="text-align:center;margin-bottom:15px;font-size:13px;color:var(--muted);">Copy and send this to our Messenger page:</p>
+            <h3 style="margin:0 0 15px 0;color:var(--success);text-align:center;font-size:20px;">Order Placed!</h3>
+            <div class="auto-copy-note">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+                <span><strong>Summary copied automatically!</strong> Messenger is opening — just <strong>paste (Ctrl+V)</strong> and hit send.</span>
+            </div>
+            <p style="text-align:center;margin-bottom:8px;font-size:12px;color:var(--muted);">Your order summary (for your reference):</p>
             <div class="copy-box" id="order-summary-text"></div>
-            <button class="copy-btn" id="copy-summary-btn" style="width:100%;">Copy Summary</button>
-            <div style="display:flex;gap:10px;margin-top:20px;">
+            <div style="display:flex;gap:10px;margin-top:16px;">
                 <button class="cancel-btn" id="close-summary-btn">Close</button>
-                <button class="proceed-btn" id="open-messenger-btn">Go to Messenger</button>
+                <button class="proceed-btn" id="open-messenger-btn">Open Messenger</button>
             </div>
         </div>
     </div>
@@ -558,7 +603,7 @@
     <div class="modal-overlay" id="history-modal">
         <div class="modal-content wide">
             <button class="modal-close" id="close-history">&times;</button>
-            <h3 style="margin:0 0 20px 0;color:var(--accent);text-align:center;font-size:20px;">Order History</h3>
+            <h3 style="margin:0 0 20px 0;color:var(--accent);text-align:center;font-size:20px;">Order History <span style="font-size:12px;color:var(--purple);font-weight:600;">(Admin Only)</span></h3>
             <div id="history-list"></div>
             <button class="clear-history-btn" id="clear-history">Clear All History</button>
         </div>
@@ -571,10 +616,6 @@
     const EMAILJS_PUBLIC_KEY = '_weUCF_qXYkfbQjRa';
     const EMAILJS_SERVICE_ID = 'Jh5tBtuBaT56RkT78k6kh';
     const EMAILJS_TEMPLATE_ID = 'template_vmi3ypn';
-    // Admin password is stored as a SHA-256 hash so the real password never
-    // appears in the page source. To change it: run
-    //   node -e "console.log(require('crypto').createHash('sha256').update('YOURPASS').digest('hex'))"
-    // and replace the hash below.
     const ADMIN_PASSWORD_HASH = '90bfe04ee5921f0c7ce8a50352eea54456b39dc24ad69e6c393f2ae23012ca27';
     
     const PRODUCTS_VERSION = 1;
@@ -726,10 +767,9 @@
         { id: 113, name: "Maltesers Fun Size (144g)", price: 222, category: "snacks", catLabel: "Snacks & Treats", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR--UfbRMkHNhie5BfRHpIfFatgfiZzKeEbyras6VVS8Q&s=10" },
         { id: 114, name: "Maltesers Bucket (565g)", price: 539, category: "snacks", catLabel: "Snacks & Treats", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSrZpUcUrbr7KBtAkpAo-pGMXgsU21OGEJ_NsmkZoKuXA&s=10" },
         { id: 115, name: "Finca Andrade Malbec Buy 1 Take 1 (750ML)", price: 499, category: "alcohol", catLabel: "Beverages & Spirits", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSO91FEzyiOYyt6t4knnx2wYTrk3khTN4pUsQepfVpCog&s=10" },
-	{ id: 116, name: "Neocell Super Collagen Peptides (600MG)", price: 1599, category: "personalcare", catLabel: "Personal Care", img: "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcRoE7e7Z8OXYT8mnXrin_m5WRrrA5W-bnlqIrKUBey07kmptVNRYoZmJOULXVXHqrJYFDSZ6w7yLAuYtPwvu2lHjxfgQ3wcLmQxXH4ljnsIqUjIXJqX9VquGg_fzTrMq4dsanJ0QQ&usqp=CAc" },
-	{ id: 117, name: "Cheertalk Sunflower Seeds (350G)", price: 99, category: "snacks", catLabel: "Snacks & Treats", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSrZpUcUrbr7KBtAkpAo-pGMXgsU21OGEJ_NsmkZoKuXA&s=10" },
-	{ id: 118, name: "Southern Valley Whole Corn Kernel (1KG)", price: 149, category: "snacks", catLabel: "Snacks & Treats", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQVxZceCOH7uuwbkLyExqOuZXJBFyaRNH0bbqxR28Wxgw&s" },
-	
+        { id: 116, name: "Neocell Super Collagen Peptides (600MG)", price: 1599, category: "personalcare", catLabel: "Personal Care", img: "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcRoE7e7Z8OXYT8mnXrin_m5WRrrA5W-bnlqIrKUBey07kmptVNRYoZmJOULXVXHqrJYFDSZ6w7yLAuYtPwvu2lHjxfgQ3wcLmQxXH4ljnsIqUjIXJqX9VquGg_fzTrMq4dsanJ0QQ&usqp=CAc" },
+        { id: 117, name: "Cheertalk Sunflower Seeds (350G)", price: 99, category: "snacks", catLabel: "Snacks & Treats", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSrZpUcUrbr7KBtAkpAo-pGMXgsU21OGEJ_NsmkZoKuXA&s=10" },
+        { id: 118, name: "Southern Valley Whole Corn Kernel (1KG)", price: 149, category: "snacks", catLabel: "Snacks & Treats", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQVxZceCOH7uuwbkLyExqOuZXJBFyaRNH0bbqxR28Wxgw&s" }
     ];
     
     let products = [];
@@ -763,8 +803,18 @@
     }
     
     let cart = [];
+    try {
+        const savedCart = localStorage.getItem('ka_snr_cart');
+        if (savedCart) cart = JSON.parse(savedCart);
+    } catch(e) {}
+    function saveCart() {
+        try { localStorage.setItem('ka_snr_cart', JSON.stringify(cart)); } catch(e) {}
+    }
     let currentOrderSummary = '';
+    let pendingOrder = null;
+    const reviewModal = document.getElementById('review-modal');
     let selectedLocation = '';
+    let orderType = 'delivery'; // 'delivery' or 'pickup'
     let activeFilter = 'all';
     let adminMode = false;
     let currentQuickViewId = null;
@@ -948,8 +998,10 @@
         });
         
         const serviceFee = subtotal * SERVICE_FEE_RATE;
-        const deliveryFee = selectedLocation ? (DELIVERY_FEES[selectedLocation] || 0) : 0;
+        const deliveryFee = (orderType === 'pickup') ? 0 : (selectedLocation ? (DELIVERY_FEES[selectedLocation] || 0) : 0);
         const grandTotal = subtotal + serviceFee + deliveryFee;
+        
+        document.getElementById('delivery-fee-label').textContent = orderType === 'pickup' ? 'Pick-up Fee:' : 'Delivery Fee:';
         
         cartBreakdown.style.display = 'block';
         document.getElementById('subtotal-price').textContent = subtotal.toFixed(2);
@@ -979,6 +1031,7 @@
         document.querySelectorAll('.remove-btn').forEach(btn => {
             btn.addEventListener('click', () => { cart.splice(parseInt(btn.dataset.index), 1); updateCartDisplay(); });
         });
+        saveCart();
     }
     
     const quickViewModal = document.getElementById('quick-view-modal');
@@ -1115,9 +1168,9 @@
         alert('Website file downloaded!\n\nNext steps:\n1. Go to your GitHub repo.\n2. Upload/replace the old HTML file with this new one.\n3. Wait ~1 minute for GitHub Pages to update.\nAll customers will then see your new products.');
     }
     
-    const historyBtn = document.getElementById('history-btn');
+    // Order History — admin only (button lives in admin toolbar)
     const historyModal = document.getElementById('history-modal');
-    historyBtn.addEventListener('click', renderOrderHistory);
+    document.getElementById('admin-history-btn').addEventListener('click', renderOrderHistory);
     document.getElementById('close-history').addEventListener('click', () => historyModal.classList.remove('show'));
     document.getElementById('clear-history').addEventListener('click', () => {
         if (confirm('Are you sure you want to clear all order history?')) {
@@ -1148,13 +1201,45 @@
     
     const backToTopBtn = document.getElementById('back-to-top');
     window.addEventListener('scroll', () => { backToTopBtn.classList.toggle('show', window.scrollY > 300); });
+    
+    // Warn the user if they try to leave / go back while their cart has items
+    window.addEventListener('beforeunload', (e) => {
+        if (cart.length > 0) {
+            e.preventDefault();
+            e.returnValue = '';
+            return '';
+        }
+    });
     backToTopBtn.addEventListener('click', () => { window.scrollTo({ top: 0, behavior: 'smooth' }); });
     
     const paymentSelect = document.getElementById('payment');
     const gcashInfo = document.getElementById('gcash-info');
     paymentSelect.addEventListener('change', () => { gcashInfo.classList.toggle('show', paymentSelect.value === 'GCash'); });
     
+    // Phone input: digits only, max 11
+    const phoneInput = document.getElementById('phone');
+    phoneInput.addEventListener('input', () => {
+        phoneInput.value = phoneInput.value.replace(/\D/g, '').slice(0, 11);
+    });
+    
+    // Order type (Delivery / Pick-up) toggle
+    const locationGroup = document.getElementById('location-group');
     const locationSelect = document.getElementById('location');
+    document.querySelectorAll('.order-type-option').forEach(opt => {
+        opt.addEventListener('click', () => {
+            document.querySelectorAll('.order-type-option').forEach(o => o.classList.remove('selected'));
+            opt.classList.add('selected');
+            orderType = opt.dataset.orderType;
+            if (orderType === 'pickup') {
+                locationGroup.style.display = 'none';
+                selectedLocation = '';
+                locationSelect.value = '';
+            } else {
+                locationGroup.style.display = '';
+            }
+            updateCartDisplay();
+        });
+    });
     locationSelect.addEventListener('change', () => { selectedLocation = locationSelect.value; updateCartDisplay(); });
     
     const infoModal = document.getElementById('info-modal');
@@ -1171,30 +1256,28 @@
     document.getElementById('close-info-modal').addEventListener('click', () => { infoModal.classList.remove('show'); clearForm(); });
     document.getElementById('cancel-btn').addEventListener('click', () => { infoModal.classList.remove('show'); clearForm(); });
     
-    document.getElementById('proceed-payment').addEventListener('click', async () => {
+    document.getElementById('proceed-payment').addEventListener('click', () => {
         hideAllErrors();
         const fullname = document.getElementById('fullname').value.trim();
         const address = document.getElementById('address').value.trim();
-        const location = document.getElementById('location').value;
-        const phone = document.getElementById('phone').value.trim();
-        const payment = document.getElementById('payment').value.trim();
-        
-        const phoneDigits = phone.replace(/\D/g, '');
-        const normalizedPhone = phoneDigits.startsWith('63') ? '0' + phoneDigits.slice(2) : phoneDigits;
+        const location = locationSelect.value;
+        const phone = phoneInput.value.trim();
+        const payment = paymentSelect.value.trim();
         
         let isValid = true;
         if (!fullname) { document.getElementById('name-error').style.display = 'block'; isValid = false; }
         if (!address) { document.getElementById('address-error').style.display = 'block'; isValid = false; }
-        if (!location) { document.getElementById('location-error').style.display = 'block'; isValid = false; }
-        if (!/^09\d{9}$/.test(normalizedPhone)) { document.getElementById('phone-error').style.display = 'block'; isValid = false; }
+        if (orderType === 'delivery' && !location) { document.getElementById('location-error').style.display = 'block'; isValid = false; }
+        // Phone must be exactly 11 digits starting with 09
+        if (!/^09\d{9}$/.test(phone)) { document.getElementById('phone-error').style.display = 'block'; isValid = false; }
         if (!payment) { document.getElementById('payment-error').style.display = 'block'; isValid = false; }
         if (!isValid) return;
         
         const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
         const serviceFee = subtotal * SERVICE_FEE_RATE;
-        const deliveryFee = DELIVERY_FEES[location] || 0;
+        const deliveryFee = (orderType === 'pickup') ? 0 : (DELIVERY_FEES[location] || 0);
         const grandTotal = subtotal + serviceFee + deliveryFee;
-        const locationName = DELIVERY_LOCATION_NAMES[location] || location;
+        const locationName = (orderType === 'pickup') ? 'Pick-up' : (DELIVERY_LOCATION_NAMES[location] || location);
         
         const orderList = cart.map(i => `${i.name} - ₱${i.price.toFixed(2)} x ${i.quantity} = ₱${(i.price*i.quantity).toFixed(2)}`).join('\n');
         
@@ -1204,69 +1287,132 @@ ${orderList}
 ----------------------------------------
 Subtotal: ₱${subtotal.toFixed(2)}
 Service Fee (10%): ₱${serviceFee.toFixed(2)}
-Delivery Fee (${locationName}): ₱${deliveryFee.toFixed(2)}
+${orderType === 'pickup' ? 'Pick-up Fee: ₱0.00 (FREE)' : `Delivery Fee (${locationName}): ₱${deliveryFee.toFixed(2)}`}
 GRAND TOTAL: ₱${grandTotal.toFixed(2)}
 ----------------------------------------
-DELIVERY: Every Sunday, 9AM-12PM
-Location: ${locationName}
+ORDER TYPE: ${orderType === 'pickup' ? 'PICK-UP' : 'DELIVERY'}
+${orderType === 'delivery' ? 'DELIVERY: Every Sunday, 9AM-12PM\nLocation: ' + locationName : 'Please coordinate pick-up schedule with us via Messenger.'}
 ----------------------------------------
 CUSTOMER:
 Name: ${fullname}
 Address: ${address}
-Contact: ${normalizedPhone}
+Contact: ${phone}
 Payment: ${payment}`;
         
         if (payment === 'GCash') {
             currentOrderSummary += `\n\nGCash Accounts:\n• 0936 541 0961 - Arcee C.\n• 0955 745 8488 - Krizel Ann M.`;
         }
         
+        pendingOrder = { fullname, address, location, phone, payment, orderType, subtotal, serviceFee, deliveryFee, grandTotal, locationName, orderList };
+        
+        // Build the review screen
+        const itemsHtml = cart.map(i => `
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;font-size:13px;padding:5px 0;border-bottom:1px dashed var(--border);gap:8px;">
+                <span style="flex:1;">${i.name} <span style="color:var(--muted);">x${i.quantity}</span></span>
+                <span style="font-weight:600;white-space:nowrap;">₱${(i.price*i.quantity).toFixed(2)}</span>
+            </div>`).join('');
+        document.getElementById('review-content').innerHTML = `
+            <div style="background:#f8fafc;border-radius:8px;padding:12px;margin-bottom:12px;font-size:13px;line-height:1.6;">
+                <div style="font-weight:700;margin-bottom:6px;color:var(--accent);">Customer Details</div>
+                <div><strong>Name:</strong> ${fullname}</div>
+                <div><strong>Address:</strong> ${address}</div>
+                <div><strong>Contact:</strong> ${phone}</div>
+                <div><strong>Order Type:</strong> ${orderType === 'pickup' ? 'Pick-up (no delivery fee)' : 'Delivery — ' + locationName}</div>
+                <div><strong>Payment:</strong> ${payment}</div>
+            </div>
+            <div style="font-weight:700;font-size:13px;margin-bottom:4px;">Items (${cart.reduce((s,i)=>s+i.quantity,0)})</div>
+            ${itemsHtml}
+            <div style="margin-top:10px;padding-top:10px;border-top:2px solid var(--border);font-size:13px;">
+                <div style="display:flex;justify-content:space-between;color:var(--muted);padding:2px 0;"><span>Subtotal</span><span>₱${subtotal.toFixed(2)}</span></div>
+                <div style="display:flex;justify-content:space-between;color:var(--accent2);padding:2px 0;"><span>Service Fee (10%)</span><span>₱${serviceFee.toFixed(2)}</span></div>
+                <div style="display:flex;justify-content:space-between;color:var(--purple);padding:2px 0;"><span>${orderType === 'pickup' ? 'Pick-up Fee' : 'Delivery Fee'}</span><span>₱${deliveryFee.toFixed(2)}</span></div>
+                <div style="display:flex;justify-content:space-between;font-weight:700;font-size:17px;color:var(--accent);padding-top:8px;border-top:1px solid var(--border);margin-top:6px;"><span>Grand Total</span><span>₱${grandTotal.toFixed(2)}</span></div>
+            </div>
+        `;
+        
+        infoModal.classList.remove('show');
+        reviewModal.classList.add('show');
+    });
+    
+    // Review screen: go back to edit shipping details
+    function backToInfoModal() {
+        reviewModal.classList.remove('show');
+        infoModal.classList.add('show');
+    }
+    document.getElementById('review-back').addEventListener('click', backToInfoModal);
+    document.getElementById('close-review').addEventListener('click', backToInfoModal);
+    
+    // Review screen: confirm — auto-copy, open Messenger, save history
+    document.getElementById('review-confirm').addEventListener('click', async () => {
+        if (!pendingOrder) return;
+        const o = pendingOrder;
+        
         if (EMAILJS_PUBLIC_KEY && EMAILJS_PUBLIC_KEY !== 'pk_xxxxxxxxxxxx') {
             try {
                 await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-                    fullname, address, location: locationName, phone: normalizedPhone, payment,
-                    order: orderList,
-                    subtotal: '₱' + subtotal.toFixed(2),
-                    serviceFee: '₱' + serviceFee.toFixed(2),
-                    deliveryFee: '₱' + deliveryFee.toFixed(2),
-                    total: '₱' + grandTotal.toFixed(2)
+                    fullname: o.fullname, address: o.address, location: o.locationName, phone: o.phone, payment: o.payment,
+                    order: o.orderList,
+                    subtotal: '₱' + o.subtotal.toFixed(2),
+                    serviceFee: '₱' + o.serviceFee.toFixed(2),
+                    deliveryFee: '₱' + o.deliveryFee.toFixed(2),
+                    total: '₱' + o.grandTotal.toFixed(2)
                 });
             } catch (e) { console.log('Email error:', e); }
         }
         
-        orderHistory.push({ date: new Date().toLocaleString('en-PH'), customer: fullname, total: '₱' + grandTotal.toFixed(2), summary: currentOrderSummary });
+        orderHistory.push({ date: new Date().toLocaleString('en-PH'), customer: o.fullname, total: '₱' + o.grandTotal.toFixed(2), summary: currentOrderSummary });
         saveOrderHistory();
         
-        infoModal.classList.remove('show');
+        // Auto-copy summary to clipboard
+        try {
+            await navigator.clipboard.writeText(currentOrderSummary);
+        } catch (e) {
+            console.log('Clipboard copy failed:', e);
+        }
+        
+        reviewModal.classList.remove('show');
         document.getElementById('order-summary-text').textContent = currentOrderSummary;
         summaryModal.classList.add('show');
+        
+        // Auto-open Messenger (triggered by this click, so popup blocker allows it)
+        try {
+            window.open(MESSENGER_LINK, '_blank');
+        } catch (e) { console.log('Messenger open failed:', e); }
         
         cart = []; selectedLocation = ''; locationSelect.value = '';
         updateCartDisplay();
         clearForm();
+        pendingOrder = null;
     });
     
     document.getElementById('close-summary-modal').addEventListener('click', () => { summaryModal.classList.remove('show'); });
     document.getElementById('close-summary-btn').addEventListener('click', () => { summaryModal.classList.remove('show'); });
-    document.getElementById('copy-summary-btn').addEventListener('click', () => {
-        navigator.clipboard.writeText(currentOrderSummary).then(() => {
-            const btn = document.getElementById('copy-summary-btn');
-            btn.textContent = 'Copied!';
-            setTimeout(() => btn.textContent = 'Copy Summary', 2000);
-        });
-    });
     document.getElementById('open-messenger-btn').addEventListener('click', () => { window.open(MESSENGER_LINK, '_blank'); });
     
     document.querySelectorAll('.modal-overlay').forEach(overlay => {
-        overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.classList.remove('show'); });
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) {
+                overlay.classList.remove('show');
+                // If they dismissed the Review screen, take them back to edit details
+                if (overlay.id === 'review-modal') infoModal.classList.add('show');
+            }
+        });
     });
     
     function hideAllErrors() { document.querySelectorAll('.error-text').forEach(el => el.style.display = 'none'); }
     function clearForm() {
         document.getElementById('fullname').value = '';
         document.getElementById('address').value = '';
-        document.getElementById('phone').value = '';
-        document.getElementById('payment').value = '';
+        phoneInput.value = '';
+        paymentSelect.value = '';
         gcashInfo.classList.remove('show');
+        // Reset order type to delivery
+        orderType = 'delivery';
+        document.querySelectorAll('.order-type-option').forEach(o => o.classList.remove('selected'));
+        document.getElementById('opt-delivery').classList.add('selected');
+        locationGroup.style.display = '';
+        selectedLocation = '';
+        locationSelect.value = '';
         hideAllErrors();
     }
     
