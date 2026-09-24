@@ -535,6 +535,20 @@
         </div>
     </div>
     
+    <div class="modal-overlay" id="leave-modal">
+        <div class="modal-content" style="max-width:380px;text-align:center;">
+            <div style="width:56px;height:56px;margin:0 auto 14px;border-radius:50%;background:rgba(217,119,6,0.12);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2" style="width:28px;height:28px;"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            </div>
+            <h3 style="margin:0 0 10px 0;color:var(--warning);font-size:18px;">Leave this page?</h3>
+            <p style="margin:0 0 18px 0;font-size:14px;color:var(--text);line-height:1.5;">You still have <strong id="leave-cart-count">items</strong> in your cart. Don't worry — your cart is saved on this phone, but make sure you're done before leaving.</p>
+            <div style="display:flex;gap:10px;">
+                <button class="proceed-btn" id="leave-stay" style="background:var(--accent);">Stay</button>
+                <button class="cancel-btn" id="leave-confirm">Leave Anyway</button>
+            </div>
+        </div>
+    </div>
+    
     <div class="modal-overlay" id="quick-view-modal">
         <div class="modal-content wide">
             <button class="modal-close" id="close-quick-view">&times;</button>
@@ -1211,9 +1225,61 @@
             var msg = 'You have items in your cart. Are you sure you want to leave? Your cart is saved on this device.';
             e = e || window.event;
             if (e) { e.preventDefault(); e.returnValue = msg; }
+
             return msg;
         }
     };
+
+    // ---- Mobile back-button interception ----
+    // Mobile browsers suppress the native beforeunload dialog, so we intercept
+    // the hardware/swipe back button via history.pushState + popstate and show
+    // our own touch-friendly warning. Desktop keeps the native dialog above.
+    var isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ||
+                   ('ontouchstart' in window && window.innerWidth <= 900);
+    if (isMobile) {
+        var allowBackNavigation = false;
+        try { history.pushState({ ka_snr: 'stay' }, '', location.href); } catch(e) {}
+
+        // Re-arm after returning from bfcache (mobile often freezes the tab)
+        window.addEventListener('pageshow', function(e) {
+            if (e.persisted && !allowBackNavigation) {
+                try { history.pushState({ ka_snr: 'stay' }, '', location.href); } catch(err) {}
+            }
+        });
+
+        window.addEventListener('popstate', function() {
+            if (allowBackNavigation) return;
+
+            // If a checkout/review modal is open, back button closes it first
+            var openModals = Array.prototype.slice.call(document.querySelectorAll('.modal-overlay.show'));
+            if (openModals.length > 0) {
+                try { history.pushState({ ka_snr: 'stay' }, '', location.href); } catch(e) {}
+                openModals[openModals.length - 1].classList.remove('show');
+                return;
+            }
+
+            if (cart.length > 0) {
+                try { history.pushState({ ka_snr: 'stay' }, '', location.href); } catch(e) {}
+                var totalItems = cart.reduce(function(s, i) { return s + i.quantity; }, 0);
+                document.getElementById('leave-cart-count').textContent =
+                    totalItems + (totalItems === 1 ? ' item' : ' items');
+                document.getElementById('leave-modal').classList.add('show');
+            } else {
+                allowBackNavigation = true;
+                history.back();
+            }
+        });
+
+        document.getElementById('leave-stay').addEventListener('click', function() {
+            document.getElementById('leave-modal').classList.remove('show');
+        });
+        document.getElementById('leave-confirm').addEventListener('click', function() {
+            document.getElementById('leave-modal').classList.remove('show');
+            allowBackNavigation = true;
+            window.onbeforeunload = null; // no second prompt
+            history.back();
+        });
+    }
     backToTopBtn.addEventListener('click', () => { window.scrollTo({ top: 0, behavior: 'smooth' }); });
     
     const paymentSelect = document.getElementById('payment');
