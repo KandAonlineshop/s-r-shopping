@@ -1202,14 +1202,18 @@
     const backToTopBtn = document.getElementById('back-to-top');
     window.addEventListener('scroll', () => { backToTopBtn.classList.toggle('show', window.scrollY > 300); });
     
-    // Warn the user if they try to leave / go back while their cart has items
-    window.addEventListener('beforeunload', (e) => {
+    // Warn the user if they try to leave / go back while their cart has items.
+    // Uses the classic onbeforeunload assignment with a NON-EMPTY return value —
+    // this is the only form that reliably triggers the browser's native
+    // "Leave site?" confirmation dialog in Chrome / Edge / Safari.
+    window.onbeforeunload = function(e) {
         if (cart.length > 0) {
-            e.preventDefault();
-            e.returnValue = '';
-            return '';
+            var msg = 'You have items in your cart. Are you sure you want to leave? Your cart is saved on this device.';
+            e = e || window.event;
+            if (e) { e.preventDefault(); e.returnValue = msg; }
+            return msg;
         }
-    });
+    };
     backToTopBtn.addEventListener('click', () => { window.scrollTo({ top: 0, behavior: 'smooth' }); });
     
     const paymentSelect = document.getElementById('payment');
