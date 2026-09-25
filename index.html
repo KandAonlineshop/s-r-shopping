@@ -381,11 +381,12 @@
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                         Order History
                     </button>
+                    <button class="icon-btn" id="cloud-login-btn" style="position:static;box-shadow:none;background:#0f766e;color:#fff;border-color:#0f766e;">☁️ Cloud Admin Login</button>
                     <button class="icon-btn export-btn" id="export-btn" style="position:static;box-shadow:none;">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                         Export Website for GitHub
                     </button>
-                    <span class="hint"><strong>Tip:</strong> Changes auto-save on this device only. Click <strong>Export</strong> to download the updated site file, then upload it to GitHub to publish for all customers.</span>
+                    <span class="hint"><strong>Tip:</strong> Product changes auto-save on this device only. Orders are saved centrally in Supabase. Click <strong>Export</strong> to download the updated site file, then upload it to GitHub to publish for all customers.</span>
                 </div>
                 
                 <div class="price-notice">
@@ -631,6 +632,7 @@
     </div>
     
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 (function() {
     const MESSENGER_LINK = 'https://www.m.me/KandAPasaBuy';
@@ -638,8 +640,11 @@
     const EMAILJS_SERVICE_ID = 'Jh5tBtuBaT56RkT78k6kh';
     const EMAILJS_TEMPLATE_ID = 'template_vmi3ypn';
     const ADMIN_PASSWORD_HASH = '90bfe04ee5921f0c7ce8a50352eea54456b39dc24ad69e6c393f2ae23012ca27';
+    const SUPABASE_URL = 'https://bpggzyyqhasoskiwfdzo.supabase.co';
+    const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_v_55AFUiNEMq1vZX1y-GjQ_4M0GuTF2';
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
     
-    const PRODUCTS_VERSION = 2;
+    const PRODUCTS_VERSION = 4;
     const SERVICE_FEE_RATE = 0.10;
     const MINIMUM_ORDER = 500;
     
@@ -1196,37 +1201,97 @@
         alert('Website file downloaded!\n\nNext steps:\n1. Go to your GitHub repo.\n2. Upload/replace the old HTML file with this new one.\n3. Wait ~1 minute for GitHub Pages to update.\nAll customers will then see your new products.');
     }
     
+    // Supabase cloud order helpers
+    async function saveOrderToCloud(order, items) {
+        const { data: created, error: orderError } = await supabaseClient
+            .from('orders')
+            .insert({
+                customer_name: order.fullname, address: order.address, phone: order.phone,
+                payment_method: order.payment, order_type: order.orderType,
+                location_key: order.location, location_name: order.locationName,
+                subtotal: order.subtotal, service_fee: order.serviceFee,
+                delivery_fee: order.deliveryFee, grand_total: order.grandTotal,
+                order_summary: currentOrderSummary
+            })
+            .select('id,order_no')
+            .single();
+        if (orderError) throw orderError;
+        const rows = items.map(i => ({
+            order_id: created.id, product_id: i.id, product_name: i.name,
+            unit_price: i.price, quantity: i.quantity, line_total: i.price * i.quantity
+        }));
+        const { error: itemError } = await supabaseClient.from('order_items').insert(rows);
+        if (itemError) throw itemError;
+        return created;
+    }
+
+    async function cloudAdminLogin() {
+        const email = prompt('Admin email:');
+        if (!email) return;
+        const password = prompt('Supabase admin password:');
+        if (!password) return;
+        const { error } = await supabaseClient.auth.signInWithPassword({ email: email.trim(), password });
+        if (error) { alert('Cloud Admin Login failed: ' + error.message); return; }
+        alert('Cloud Admin connected. Order History will now load from Supabase.');
+        renderOrderHistory();
+    }
+
+    async function cloudAdminLogout() {
+        await supabaseClient.auth.signOut();
+    }
+
+    async function fetchCloudOrders() {
+        const { data: orders, error } = await supabaseClient
+            .from('orders')
+            .select('id,order_no,customer_name,address,phone,payment_method,order_type,location_name,subtotal,service_fee,delivery_fee,grand_total,status,created_at,order_summary,order_items(product_name,unit_price,quantity,line_total)')
+            .order('created_at', { ascending: false });
+        if (error) throw error;
+        return orders || [];
+    }
+
     // Order History — admin only (button lives in admin toolbar)
     const historyModal = document.getElementById('history-modal');
     document.getElementById('admin-history-btn').addEventListener('click', renderOrderHistory);
+    document.getElementById('cloud-login-btn').addEventListener('click', cloudAdminLogin);
     document.getElementById('close-history').addEventListener('click', () => historyModal.classList.remove('show'));
     document.getElementById('clear-history').addEventListener('click', () => {
         if (confirm('Are you sure you want to clear all order history?')) {
             orderHistory = []; saveOrderHistory(); renderOrderHistory();
         }
     });
-    function renderOrderHistory() {
+    async function renderOrderHistory() {
         const historyList = document.getElementById('history-list');
-        if (orderHistory.length === 0) {
-            historyList.innerHTML = '<p class="history-empty">No order history yet</p>';
+        const { data: sessionData } = await supabaseClient.auth.getSession();
+        if (sessionData && sessionData.session) {
+            try {
+                const orders = await fetchCloudOrders();
+                if (!orders.length) {
+                    historyList.innerHTML = '<p class="history-empty">No cloud orders yet</p>';
+                } else {
+                    historyList.innerHTML = orders.map(order => {
+                        const items = (order.order_items || []).map(i => `${i.product_name} x${i.quantity} — ₱${Number(i.line_total).toFixed(2)}`).join('<br>');
+                        return `
+                          <div class="history-item">
+                            <div class="history-header"><span>Order #${order.order_no} — ${order.customer_name}</span><span class="history-total">₱${Number(order.grand_total).toFixed(2)}</span></div>
+                            <div class="history-date">${new Date(order.created_at).toLocaleString('en-PH')} · <strong>${order.status}</strong></div>
+                            <div class="history-details" style="margin-top:8px;">${items}<br><br>${order.address}<br>${order.phone} · ${order.payment_method}</div>
+                          </div>`;
+                    }).join('');
+                }
+            } catch (e) {
+                historyList.innerHTML = '<p class="history-empty">Cloud history error: ' + (e.message || 'Unknown error') + '</p>';
+            }
+        } else if (orderHistory.length === 0) {
+            historyList.innerHTML = '<p class="history-empty">No local order history. Use ☁️ Cloud Admin Login to view orders from all devices.</p>';
         } else {
             historyList.innerHTML = orderHistory.slice().reverse().map((order, i) => {
                 const idx = orderHistory.length - 1 - i;
-                return `
-                    <div class="history-item">
-                        <div class="history-header">
-                            <span>Order #${idx + 1} &mdash; ${order.customer}</span>
-                            <span class="history-total">${order.total}</span>
-                        </div>
-                        <div class="history-date">${order.date}</div>
-                        <div class="history-details" style="margin-top:8px;">${order.summary}</div>
-                    </div>
-                `;
+                return `<div class="history-item"><div class="history-header"><span>Order #${idx + 1} &mdash; ${order.customer}</span><span class="history-total">${order.total}</span></div><div class="history-date">${order.date}</div><div class="history-details" style="margin-top:8px;">${order.summary}</div></div>`;
             }).join('');
         }
         historyModal.classList.add('show');
     }
-    
+
     const backToTopBtn = document.getElementById('back-to-top');
     window.addEventListener('scroll', () => { backToTopBtn.classList.toggle('show', window.scrollY > 300); });
     
@@ -1444,6 +1509,13 @@ Payment: ${payment}`;
             } catch (e) { console.log('Email error:', e); }
         }
         
+        try {
+            const cloudOrder = await saveOrderToCloud(o, cart);
+            currentOrderSummary = currentOrderSummary.replace('SUMMARY OF YOUR ORDER - K&A S&R PasaBUY', 'ORDER #' + cloudOrder.order_no + ' — K&A S&R PasaBUY');
+        } catch (e) {
+            console.error('Cloud order save failed:', e);
+            alert('Hindi na-save sa cloud ang order. Na-save pa rin locally at puwedeng i-send sa Messenger. Error: ' + (e.message || 'Unknown error'));
+        }
         orderHistory.push({ date: new Date().toLocaleString('en-PH'), customer: o.fullname, total: '₱' + o.grandTotal.toFixed(2), summary: currentOrderSummary });
         saveOrderHistory();
         
