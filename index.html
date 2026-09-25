@@ -81,6 +81,9 @@
     .filter-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
     .filter-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
     
+    /* Mini Admin Dashboard */
+    .mini-dashboard{display:none;margin:0 0 16px}.mini-dashboard.show{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}.dash-card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:12px;box-shadow:0 2px 8px rgba(0,0,0,.05)}.dash-label{font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.4px}.dash-value{font-size:22px;font-weight:800;color:var(--text);margin-top:3px}.dash-sub{font-size:11px;color:var(--muted);margin-top:2px}.dashboard-modal-content{max-width:760px}.dashboard-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:16px}.dashboard-detail{border:1px solid var(--border);border-radius:12px;padding:14px;background:#fff}.dashboard-detail h4{margin:0 0 8px;font-size:13px}.dashboard-detail p{margin:4px 0;font-size:13px;color:var(--muted)}.floating-cart{display:none}@media(max-width:900px){.mini-dashboard.show{grid-template-columns:repeat(2,minmax(0,1fr))}.floating-cart{position:fixed;left:12px;right:12px;bottom:12px;z-index:998;display:none;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;border:1px solid rgba(0,75,147,.18);border-radius:16px;background:rgba(255,255,255,.96);backdrop-filter:blur(10px);box-shadow:0 8px 28px rgba(0,0,0,.16)}.floating-cart.show{display:flex}.floating-cart-summary{min-width:0}.floating-cart-count{font-size:11px;color:var(--muted);font-weight:700}.floating-cart-total{font-size:16px;font-weight:800;color:var(--text)}.floating-cart-btn{border:0;background:var(--accent);color:#fff;border-radius:11px;padding:10px 14px;font-weight:800;cursor:pointer;white-space:nowrap}.dashboard-grid{grid-template-columns:1fr}body{padding-bottom:82px}}
+
     .back-to-top {
         position: fixed; bottom: 24px; right: 24px; width: 48px; height: 48px;
         border-radius: 50%; background: var(--accent); color: #fff; border: none;
@@ -154,12 +157,58 @@
     }
     .product-card:hover .quick-view-overlay { opacity: 1; }
     .quick-view-overlay svg { width: 16px; height: 16px; }
+    .product-card-actions {
+        position: absolute; top: 10px; right: 10px; display: flex; align-items: center; gap: 6px;
+        z-index: 20;
+    }
+    .product-card-actions button {
+        position: relative !important; top: auto !important; right: auto !important; left: auto !important;
+        flex: 0 0 auto;
+    }
     .admin-edit-btn {
-        position: absolute; top: 22px; right: 22px; background: var(--purple); color: #fff;
-        border: none; border-radius: 50%; width: 28px; height: 28px; cursor: pointer;
-        font-size: 14px; display: none; align-items: center; justify-content: center; z-index: 5;
+        background: var(--purple); color: #fff; border: none; border-radius: 50%; width: 30px; height: 30px;
+        cursor: pointer; font-size: 14px; display: none; align-items: center; justify-content: center;
+        z-index: 5; box-shadow: 0 2px 7px rgba(0,0,0,.14);
     }
     .admin-mode .admin-edit-btn { display: flex; }
+    .phase1-section { margin-bottom: 30px; padding: 16px; border: 1px solid var(--border); border-radius: 16px; background: #fff; }
+    .featured-section { border: 2px solid rgba(245,158,11,.28); background: linear-gradient(135deg,#fffbeb,#fff); }
+    .new-section { border: 2px solid rgba(16,185,129,.22); background: linear-gradient(135deg,#ecfdf5,#fff); }
+    .phase1-heading { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:12px; }
+    .phase1-heading h3 { margin:0; font-size:18px; font-weight:700; color:var(--accent); }
+    .phase1-sub { color:var(--muted); font-size:12px; }
+    .phase1-heading-actions { display:flex; gap:6px; }
+    .section-link-btn { border:1px solid var(--border); background:#fff; color:var(--accent); border-radius:8px; padding:6px 10px; font-size:11px; font-weight:700; cursor:pointer; }
+    .section-link-btn:hover { background:var(--accent-soft); }
+    .wishlist-btn {
+        width:30px; height:30px; border:1px solid rgba(220,38,38,.18); border-radius:50%; background:rgba(255,255,255,.96);
+        color:#94a3b8; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:17px;
+        line-height:1; box-shadow:0 2px 7px rgba(0,0,0,.10);
+    }
+    .wishlist-btn.active { color:#dc2626; background:#fff1f2; border-color:#fecdd3; }
+    .wishlist-btn:hover { transform:scale(1.05); }
+    .status-badge { display:inline-flex; align-items:center; padding:3px 8px; border-radius:999px; font-size:10px; font-weight:800; margin:0 4px 7px 0; }
+    .new-badge { background:#dcfce7; color:#166534; }
+    .best-badge { background:#fef3c7; color:#92400e; }
+    .wishlist-filter-btn { border-color:#fecdd3 !important; color:#be123c !important; }
+    .wishlist-filter-btn.active { background:#e11d48 !important; color:#fff !important; border-color:#e11d48 !important; }
+    .phase1-toast { position:fixed; left:50%; bottom:24px; transform:translate(-50%,20px); background:#0f172a; color:#fff; padding:10px 16px; border-radius:10px; font-size:13px; font-weight:600; opacity:0; pointer-events:none; transition:.2s; z-index:2000; }
+    .phase1-toast.show { opacity:1; transform:translate(-50%,0); }
+    @media (max-width: 640px) {
+        .category-filters { flex-wrap:nowrap; overflow-x:auto; padding-bottom:4px; scrollbar-width:none; }
+        .category-filters::-webkit-scrollbar { display:none; }
+        .filter-btn { white-space:nowrap; }
+        .category-items { grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+        .product-card { padding:10px; }
+        .product-card img { height:125px; }
+        .quick-view-overlay { top:10px; left:10px; right:10px; height:125px; }
+        .phase1-section, .promo-section { padding:12px; }
+        .phase1-heading { align-items:flex-start; }
+        .phase1-heading-actions { flex-shrink:0; }
+        .section-link-btn { padding:5px 8px; }
+        .product-card-actions { top:7px; right:7px; gap:4px; }
+        .wishlist-btn, .admin-edit-btn { width:27px; height:27px; font-size:15px; }
+    }
     .add-btn {
         width: 100%; background: var(--accent-soft); color: var(--accent);
         border: 1px solid var(--accent); padding: 10px; border-radius: 8px;
@@ -300,61 +349,6 @@
         display: flex; align-items: center; gap: 8px;
     }
     .auto-copy-note svg { width: 18px; height: 18px; flex-shrink: 0; color: var(--success); }
-
-    .mobile-cart-toggle { display:none; }
-    @media (max-width: 900px) {
-        body { padding-bottom: 76px; }
-        .sticky-cart {
-            position: fixed;
-            left: 10px;
-            right: 10px;
-            bottom: 10px;
-            top: auto;
-            z-index: 1000;
-            max-height: 76vh;
-            transform: translateY(calc(100% - 62px));
-            transition: transform .22s ease, box-shadow .22s ease;
-            box-shadow: 0 8px 30px rgba(15,23,42,.20);
-            border-radius: 16px;
-            overflow: hidden;
-            background: #fff;
-        }
-        .sticky-cart.mobile-cart-open {
-            transform: translateY(0);
-            box-shadow: 0 12px 40px rgba(15,23,42,.28);
-        }
-        .sticky-cart .cart-section {
-            max-height: 76vh;
-            overflow-y: auto;
-            border-radius: 16px;
-        }
-        .mobile-cart-toggle {
-            display:flex;
-            position:sticky;
-            top:0;
-            z-index:2;
-            align-items:center;
-            justify-content:space-between;
-            gap:10px;
-            width:100%;
-            min-height:62px;
-            padding:10px 14px;
-            border:0;
-            border-bottom:1px solid var(--border);
-            background:#fff;
-            color:var(--text);
-            cursor:pointer;
-            font:inherit;
-        }
-        .mobile-cart-toggle .mcart-left { display:flex; align-items:center; gap:9px; font-weight:700; }
-        .mobile-cart-toggle .mcart-summary { display:flex; align-items:center; gap:8px; font-size:13px; color:var(--muted); }
-        .mobile-cart-toggle .mcart-total { color:var(--accent); font-weight:800; font-size:16px; }
-        .mobile-cart-toggle .mcart-arrow { font-size:18px; transition:transform .2s ease; }
-        .sticky-cart.mobile-cart-open .mcart-arrow { transform:rotate(180deg); }
-        .sticky-cart .cart-section > .section-title { display:none; }
-        .sticky-cart .cart-section { padding-top:0; }
-        .sticky-cart .checkout-btn { position:sticky; bottom:0; margin-bottom:0; }
-    }
     
     .gcash-info { display: none; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 12px; margin-top: 8px; }
     .gcash-info.show { display: block; }
@@ -436,12 +430,12 @@
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                         Order History
                     </button>
-                    <button class="icon-btn" id="cloud-login-btn" style="position:static;box-shadow:none;background:#0f766e;color:#fff;border-color:#0f766e;">☁️ Cloud Admin Login</button>
+                    <button class="icon-btn" id="admin-dashboard-btn" style="position:static;box-shadow:none;background:var(--purple);color:#fff;border-color:var(--purple);">📊 Mini Dashboard</button>
                     <button class="icon-btn export-btn" id="export-btn" style="position:static;box-shadow:none;">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                         Export Website for GitHub
                     </button>
-                    <span class="hint"><strong>Tip:</strong> Product changes auto-save on this device only. Orders are saved centrally in Supabase. Click <strong>Export</strong> to download the updated site file, then upload it to GitHub to publish for all customers.</span>
+                    <span class="hint"><strong>Tip:</strong> Changes auto-save on this device only. Click <strong>Export</strong> to download the updated site file, then upload it to GitHub to publish for all customers.</span>
                 </div>
                 
                 <div class="price-notice">
@@ -458,6 +452,7 @@
                     <span><strong>Delivery Schedule:</strong> Every Sunday, 9:00 AM - 12:00 PM only &nbsp;|&nbsp; <strong>Pick-up</strong> also available — just choose at checkout</span>
                 </div>
                 
+                <div class="mini-dashboard" id="mini-dashboard"><div class="dash-card"><div class="dash-label">Products</div><div class="dash-value" id="dash-products">0</div><div class="dash-sub">Active catalog</div></div><div class="dash-card"><div class="dash-label">Promo</div><div class="dash-value" id="dash-promo">0</div><div class="dash-sub">Buy 1 Take 1</div></div><div class="dash-card"><div class="dash-label">New</div><div class="dash-value" id="dash-new">0</div><div class="dash-sub">New arrivals</div></div><div class="dash-card"><div class="dash-label">Best Sellers</div><div class="dash-value" id="dash-best">0</div><div class="dash-sub">Featured products</div></div><div class="dash-card"><div class="dash-label">Orders</div><div class="dash-value" id="dash-orders">0</div><div class="dash-sub">Saved on this device</div></div></div>
                 <div class="search-container">
                     <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
                     <input type="text" id="search-input" class="search-input" placeholder="Search products...">
@@ -467,19 +462,8 @@
                 <div id="products-container"></div>
             </div>
             
-            <div class="sticky-cart" id="sticky-cart">
+            <div class="sticky-cart">
                 <div class="cart-section">
-                    <button class="mobile-cart-toggle" id="mobile-cart-toggle" type="button" aria-expanded="false">
-                        <span class="mcart-left">
-                            <span aria-hidden="true">🛒</span>
-                            <span>My Cart</span>
-                            <span class="cart-count-badge" id="mobile-cart-count">0</span>
-                        </span>
-                        <span class="mcart-summary">
-                            <span class="mcart-total">₱<span id="mobile-cart-total">0.00</span></span>
-                            <span class="mcart-arrow" aria-hidden="true">⌃</span>
-                        </span>
-                    </button>
                     <div class="section-title" style="font-size:18px;margin-bottom:14px;">
                         <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--accent);width:20px;height:20px;">
                             <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/>
@@ -501,6 +485,8 @@
         </div>
     </div>
     
+    <div class="floating-cart" id="floating-cart"><div class="floating-cart-summary"><div class="floating-cart-count" id="floating-cart-count">0 items</div><div class="floating-cart-total" id="floating-cart-total">₱0.00</div></div><button class="floating-cart-btn" id="floating-cart-btn">🛒 View Cart</button></div>
+
     <button class="back-to-top" id="back-to-top" title="Back to Top">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg>
     </button>
@@ -652,6 +638,8 @@
         </div>
     </div>
     
+    <div class="modal-overlay" id="admin-dashboard-modal"><div class="modal-content dashboard-modal-content"><button class="modal-close" id="close-admin-dashboard">&times;</button><div class="modal-title">📊 Mini Dashboard</div><p style="margin:0;color:var(--muted);font-size:13px;">Quick overview of your catalog and saved order activity on this device.</p><div class="dashboard-grid"><div class="dashboard-detail"><h4>Catalog</h4><p>Products: <strong id="dash-modal-products">0</strong></p><p>Promo Buy 1 Take 1: <strong id="dash-modal-promo">0</strong></p><p>New Arrivals: <strong id="dash-modal-new">0</strong></p><p>Best Sellers: <strong id="dash-modal-best">0</strong></p></div><div class="dashboard-detail"><h4>Orders & Cart</h4><p>Saved orders: <strong id="dash-modal-orders">0</strong></p><p>Current cart items: <strong id="dash-modal-cart-items">0</strong></p><p>Current cart subtotal: <strong id="dash-modal-cart-total">₱0.00</strong></p><p>Favorites: <strong id="dash-modal-favorites">0</strong></p></div></div></div></div>
+
     <div class="modal-overlay" id="admin-edit-modal">
         <div class="modal-content">
             <button class="modal-close" id="close-admin-edit">&times;</button>
@@ -659,6 +647,8 @@
             <div class="form-group"><label for="edit-name">Product Name</label><input type="text" id="edit-name"></div>
             <div class="form-group"><label for="edit-price">Price (₱)</label><input type="number" id="edit-price" step="0.01" min="0"></div>
             <div class="form-group"><label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:600;"><input type="checkbox" id="edit-promo" style="width:auto;"> 🔥 Promo Buy 1 Take 1</label></div>
+            <div class="form-group"><label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:600;"><input type="checkbox" id="edit-new" style="width:auto;"> 🆕 New Arrival</label></div>
+            <div class="form-group"><label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:600;"><input type="checkbox" id="edit-best" style="width:auto;"> ⭐ Best Seller</label></div>
             <div style="display:flex;gap:10px;">
                 <button class="delete-btn-inline" id="edit-delete">Delete</button>
                 <button class="cancel-btn" id="edit-cancel">Cancel</button>
@@ -675,6 +665,8 @@
             <div class="form-group"><label for="add-price">Price (₱) *</label><input type="number" id="add-price" step="0.01" min="0" placeholder="e.g. 108"></div>
             <div class="form-group"><label for="add-category">Category *</label><select id="add-category"></select></div>
             <div class="form-group"><label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:600;"><input type="checkbox" id="add-promo" style="width:auto;"> 🔥 Promo Buy 1 Take 1</label></div>
+            <div class="form-group"><label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:600;"><input type="checkbox" id="add-new" style="width:auto;"> 🆕 New Arrival</label></div>
+            <div class="form-group"><label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:600;"><input type="checkbox" id="add-best" style="width:auto;"> ⭐ Best Seller</label></div>
             <div class="form-group">
                 <label for="add-img">Image URL (optional)</label>
                 <input type="url" id="add-img" placeholder="https://... direct link to product photo">
@@ -698,7 +690,6 @@
     </div>
     
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 (function() {
     const MESSENGER_LINK = 'https://www.m.me/KandAPasaBuy';
@@ -706,11 +697,8 @@
     const EMAILJS_SERVICE_ID = 'Jh5tBtuBaT56RkT78k6kh';
     const EMAILJS_TEMPLATE_ID = 'template_vmi3ypn';
     const ADMIN_PASSWORD_HASH = '90bfe04ee5921f0c7ce8a50352eea54456b39dc24ad69e6c393f2ae23012ca27';
-    const SUPABASE_URL = 'https://bpggzyyqhasoskiwfdzo.supabase.co';
-    const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_v_55AFUiNEMq1vZX1y-GjQ_4M0GuTF2';
-    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
     
-    const PRODUCTS_VERSION = 4;
+    const PRODUCTS_VERSION = 3;
     const SERVICE_FEE_RATE = 0.10;
     const MINIMUM_ORDER = 500;
     
@@ -744,16 +732,16 @@
     }
     
     const DEFAULT_PRODUCTS = [
-        { id: 1, name: "Pringles Original (149g)", price: 108, category: "snacks", catLabel: "Snacks & Treats", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTS9Oub4AIrHQb7gPUT8-yyVZkOw-LTGKcNI6OfnLO8Lg&s=10" },
+        { id: 1, name: "Pringles Original (149g)", price: 108, isBestSeller: true, category: "snacks", catLabel: "Snacks & Treats", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTS9Oub4AIrHQb7gPUT8-yyVZkOw-LTGKcNI6OfnLO8Lg&s=10" },
         { id: 2, name: "Meiji Choco Baby (102g)", price: 159, category: "snacks", catLabel: "Snacks & Treats", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRdR8WLxEMm-z3xvG2BIhs5tbzoHQGROvcEPSrbuZf5qg&s=10" },
         { id: 3, name: "Toblerone Tiny (200g)", price: 239, category: "snacks", catLabel: "Snacks & Treats", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRvnxNTLnTeRF489Rm9Yhf466MzXHcjY8vQ-Lf6OGS5dg&s=10" },
         { id: 4, name: "Pik-Nik Original (396g)", price: 235, category: "snacks", catLabel: "Snacks & Treats", img: "https://www.snrshopping.com/upload/product_details/5fa8ffc5689ee_1604911045.jpg" },
-        { id: 5, name: "Samyang Hot Chicken Ramen", price: 84, category: "pantry", catLabel: "Pantry Essentials", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcREKX9h2-ZFt_atvZkkHL0YRkxn3MftVrotrRmKx_AJyQ&s=10" },
+        { id: 5, name: "Samyang Hot Chicken Ramen", price: 84, isBestSeller: true, category: "pantry", catLabel: "Pantry Essentials", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcREKX9h2-ZFt_atvZkkHL0YRkxn3MftVrotrRmKx_AJyQ&s=10" },
         { id: 6, name: "Samyang Buldak Swicy (105g)", price: 84, category: "pantry", catLabel: "Pantry Essentials", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQvFtvVNOwXSFKS1ToiFfgaH6lBfA5yegI2pAn0oXXSiA&s=10" },
         { id: 7, name: "Samyang Hot Chicken Cheese Bowl (105g)", price: 84, category: "pantry", catLabel: "Pantry Essentials", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS7ZvdV41OItKYlN456BvAHHvqqB9WPOq2iRGQRXjddww&s=10" },
         { id: 8, name: "Samyang Hot Chicken Carbonara Bowl (105g)", price: 84, category: "pantry", catLabel: "Pantry Essentials", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSIuIj9GlTVkCnn9ZRHnUNJng76UiHAyCA71gr5KyJHVQ&s=10" },
         { id: 9, name: "Lotte Luncheon Meat (340g)", price: 134, category: "pantry", catLabel: "Pantry Essentials", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQrvdj7RBy-9hpxDeT8c_VQRCxkRvfCw7bdFQCqYqxCNg&s=10" },
-        { id: 10, name: "Member's Value Hazelnut Spread with Cocoa (1kg)", price: 399, category: "pantry", catLabel: "Pantry Essentials", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRCCz0SS_z4iUOZaC9E-yEIR0lqQ1KTT6CmUicRspLAsQ&s=10" },
+        { id: 10, name: "Member's Value Hazelnut Spread with Cocoa (1kg)", price: 399, isNew: true, category: "pantry", catLabel: "Pantry Essentials", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRCCz0SS_z4iUOZaC9E-yEIR0lqQ1KTT6CmUicRspLAsQ&s=10" },
         { id: 11, name: "Member's Value Real Mayonnaise (1L)", price: 279, category: "pantry", catLabel: "Pantry Essentials", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ9aIbs8r_gLzu2_n2dcbqjiVDoKj6c5pbXwDdfzqveMw&s=10" },
         { id: 12, name: "Member's Value All Purpose Dressing (1L)", price: 175, category: "pantry", catLabel: "Pantry Essentials", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQg65a_8Igu2gYnGGwTS-1MXo0aJOIaCnAI2o8ITGLSxA&s=10" },
         { id: 13, name: "Heinz Tomato Ketchup (1.25kg)", price: 299, category: "pantry", catLabel: "Pantry Essentials", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRXXS0oTDDLjyl4P7mTeStstdpSuzLPgaZWcHx9sPoeTA&s=10" },
@@ -878,7 +866,7 @@
     }
 
     // Mark existing Buy 1 Take 1 items as promos and keep saved products compatible.
-    products = products.map(p => ({ ...p, isPromo: p.isPromo === true || /buy\s*1\s*take\s*1/i.test(p.name || '') }));
+    products = products.map(p => ({ ...p, isPromo: p.isPromo === true || /buy\s*1\s*take\s*1/i.test(p.name || ''), isNew: p.isNew === true, isBestSeller: p.isBestSeller === true }));
     
     function saveProducts() {
         try {
@@ -914,6 +902,24 @@
     let adminMode = false;
     let currentQuickViewId = null;
     let currentEditId = null;
+
+    let wishlist = [];
+    try { wishlist = JSON.parse(localStorage.getItem('ka_snr_wishlist') || '[]').map(Number); } catch(e) { wishlist = []; }
+    function saveWishlist() { try { localStorage.setItem('ka_snr_wishlist', JSON.stringify(wishlist)); } catch(e) {} }
+    function isWishlisted(id) { return wishlist.includes(Number(id)); }
+    function toggleWishlist(id) {
+        id = Number(id);
+        wishlist = isWishlisted(id) ? wishlist.filter(x => x !== id) : [...wishlist, id];
+        saveWishlist();
+        renderProducts();
+        updateMiniDashboard();
+    }
+    function showToast(message) {
+        let toast = document.getElementById('phase1-toast');
+        if (!toast) { toast = document.createElement('div'); toast.id='phase1-toast'; toast.className='phase1-toast'; document.body.appendChild(toast); }
+        toast.textContent = message; toast.classList.add('show');
+        clearTimeout(window.__phase1ToastTimer); window.__phase1ToastTimer = setTimeout(() => toast.classList.remove('show'), 1600);
+    }
     
     const categoryOrder = CATEGORIES.map(c => c.label);
     const PROMO_FILTER = 'promo-buy-1-take-1';
@@ -921,6 +927,7 @@
     const filterContainer = document.getElementById('category-filters');
     filterContainer.innerHTML = `<button class="filter-btn active" data-filter="all">All Products</button>` +
         `<button class="filter-btn promo-filter-btn" data-filter="${PROMO_FILTER}">🔥 Promo Buy 1 Take 1</button>` +
+        `<button class="filter-btn wishlist-filter-btn" data-filter="wishlist">❤️ Favorites</button>` +
         categoryOrder.map(cat => `<button class="filter-btn" data-filter="${cat.toLowerCase()}">${cat}</button>`).join('');
     
     filterContainer.querySelectorAll('.filter-btn').forEach(btn => {
@@ -936,6 +943,30 @@
     addCategorySelect.innerHTML = '<option value="">-- Select Category --</option>' +
         CATEGORIES.map(c => `<option value="${c.key}">${c.label}</option>`).join('');
     
+    function productCardHTML(product) {
+        const wished = isWishlisted(product.id);
+        return `<div class="product-card" data-search-text="${(product.name+' '+product.catLabel).toLowerCase()}" data-id="${product.id}">
+            <div class="product-card-actions">
+                <button class="wishlist-btn ${wished ? 'active' : ''}" data-wishlist-id="${product.id}" title="${wished ? 'Remove from favorites' : 'Add to favorites'}" aria-label="Favorite">${wished ? '♥' : '♡'}</button>
+                <button class="admin-edit-btn" data-edit-id="${product.id}" title="Edit Product">&#9998;</button>
+            </div>
+            <img src="${product.img}" alt="${product.name}" loading="lazy" onerror="this.style.visibility='hidden'" class="product-img" data-img-id="${product.id}">
+            <div class="quick-view-overlay" data-qv-id="${product.id}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>Quick View</div>
+            <div>${product.isPromo ? '<span class="status-badge promo-badge">🔥 BUY 1 TAKE 1</span>' : ''}${product.isNew ? '<span class="status-badge new-badge">🆕 NEW</span>' : ''}${product.isBestSeller ? '<span class="status-badge best-badge">⭐ BEST SELLER</span>' : ''}</div>
+            <span class="category-chip cat-${product.category}">${product.catLabel}</span>
+            <div class="product-name">${product.name}</div><div class="price-tag">₱${product.price.toFixed(2)}</div>
+            <button class="add-btn" data-id="${product.id}">Add to Cart</button>
+        </div>`;
+    }
+
+    function makeFeatureSection(title, subtitle, items, className) {
+        if (!items.length) return '';
+        return `<div class="phase1-section ${className}" data-feature-section="true">
+            <div class="phase1-heading"><div><h3>${title}</h3><div class="phase1-sub">${subtitle}</div></div><div class="phase1-heading-actions"><button class="section-link-btn" data-feature-filter="${title.includes('Best') ? 'best' : 'new'}">View all</button></div></div>
+            <div class="category-items">${items.map(productCardHTML).join('')}</div>
+        </div>`;
+    }
+
     function renderProducts() {
         const groupedProducts = {};
         products.forEach(p => { if (!groupedProducts[p.catLabel]) groupedProducts[p.catLabel] = []; groupedProducts[p.catLabel].push(p); });
@@ -947,100 +978,65 @@
             const promoSection = document.createElement('div');
             promoSection.className = 'category-section promo-section';
             promoSection.dataset.category = PROMO_FILTER;
-            promoSection.innerHTML = `
-                <h3 class="category-heading"><span>🔥 Promo Buy 1 Take 1</span><span style="font-size:12px;color:var(--muted);font-weight:500;">(${promoItems.length} items)</span></h3>
-                <div class="category-items">${promoItems.map(product => `
-                    <div class="product-card" data-search-text="${(product.name+' '+product.catLabel+' buy 1 take 1').toLowerCase()}" data-id="${product.id}">
-                        <button class="admin-edit-btn" data-edit-id="${product.id}" title="Edit Product">&#9998;</button>
-                        <img src="${product.img}" alt="${product.name}" loading="lazy" onerror="this.style.visibility='hidden'" class="product-img" data-img-id="${product.id}">
-                        <div class="quick-view-overlay" data-qv-id="${product.id}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>Quick View</div>
-                        <span class="promo-badge">🔥 BUY 1 TAKE 1</span>
-                        <span class="category-chip cat-${product.category}">${product.catLabel}</span>
-                        <div class="product-name">${product.name}</div><div class="price-tag">₱${product.price.toFixed(2)}</div>
-                        <button class="add-btn" data-id="${product.id}">Add to Cart</button>
-                    </div>`).join('')}</div>`;
+            promoSection.innerHTML = `<h3 class="category-heading"><span>🔥 Promo Buy 1 Take 1</span><span style="font-size:12px;color:var(--muted);font-weight:500;">(${promoItems.length} items)</span></h3><div class="category-items">${promoItems.map(productCardHTML).join('')}</div>`;
             container.appendChild(promoSection);
         }
+        container.insertAdjacentHTML('beforeend', makeFeatureSection('⭐ Best Sellers','Popular picks from the shop',products.filter(p => p.isBestSeller),'featured-section'));
+        container.insertAdjacentHTML('beforeend', makeFeatureSection('🆕 New Arrivals','Fresh additions to the catalog',products.filter(p => p.isNew),'new-section'));
 
         categoryOrder.forEach(catLabel => {
             if (!groupedProducts[catLabel]) return;
             const items = groupedProducts[catLabel];
             const section = document.createElement('div'); section.className='category-section'; section.dataset.category=catLabel.toLowerCase();
-            section.innerHTML = `<h3 class="category-heading"><span>${catLabel}</span><span style="font-size:12px;color:var(--muted);font-weight:500;">(${items.length} items)</span></h3><div class="category-items">${items.map(product => `
-                <div class="product-card" data-search-text="${(product.name+' '+product.catLabel).toLowerCase()}" data-id="${product.id}">
-                    <button class="admin-edit-btn" data-edit-id="${product.id}" title="Edit Product">&#9998;</button>
-                    <img src="${product.img}" alt="${product.name}" loading="lazy" onerror="this.style.visibility='hidden'" class="product-img" data-img-id="${product.id}">
-                    <div class="quick-view-overlay" data-qv-id="${product.id}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>Quick View</div>
-                    ${product.isPromo ? '<span class="promo-badge">🔥 BUY 1 TAKE 1</span>' : ''}
-                    <span class="category-chip cat-${product.category}">${product.catLabel}</span><div class="product-name">${product.name}</div><div class="price-tag">₱${product.price.toFixed(2)}</div>
-                    <button class="add-btn" data-id="${product.id}">Add to Cart</button>
-                </div>`).join('')}</div>`;
+            section.innerHTML = `<h3 class="category-heading"><span>${catLabel}</span><span style="font-size:12px;color:var(--muted);font-weight:500;">(${items.length} items)</span></h3><div class="category-items">${items.map(productCardHTML).join('')}</div>`;
             container.appendChild(section);
         });
         document.getElementById('product-count').textContent = products.length;
         attachProductEventListeners(); applyFilters();
     }
-    
+
     function attachProductEventListeners() {
-        document.querySelectorAll('.add-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => { e.stopPropagation(); addToCart(parseInt(btn.dataset.id)); });
-        });
-        document.querySelectorAll('.product-img, .quick-view-overlay').forEach(el => {
-            el.addEventListener('click', (e) => {
-                e.stopPropagation();
-                openQuickView(parseInt(el.dataset.qvId || el.dataset.imgId));
+        document.querySelectorAll('.add-btn').forEach(btn => btn.addEventListener('click', e => { e.stopPropagation(); addToCart(parseInt(btn.dataset.id)); showToast('✓ Added to cart'); }));
+        document.querySelectorAll('.wishlist-btn').forEach(btn => btn.addEventListener('click', e => { e.stopPropagation(); toggleWishlist(parseInt(btn.dataset.wishlistId)); }));
+        document.querySelectorAll('.product-img, .quick-view-overlay').forEach(el => el.addEventListener('click', e => { e.stopPropagation(); openQuickView(parseInt(el.dataset.qvId || el.dataset.imgId)); }));
+        document.querySelectorAll('.admin-edit-btn').forEach(btn => btn.addEventListener('click', e => { e.stopPropagation(); openAdminEdit(parseInt(btn.dataset.editId)); }));
+        document.querySelectorAll('[data-feature-filter]').forEach(btn => btn.addEventListener('click', e => {
+            const type = btn.dataset.featureFilter;
+            document.querySelectorAll('[data-feature-section]').forEach(sec => sec.classList.add('hidden'));
+            document.querySelectorAll('.category-section').forEach(sec => { if (sec.dataset.category) sec.classList.remove('hidden'); });
+            document.querySelectorAll('.product-card').forEach(card => {
+                const id = Number(card.dataset.id); const p = products.find(x => x.id === id);
+                card.classList.toggle('hidden', !(p && (type === 'best' ? p.isBestSeller : p.isNew)));
             });
-        });
-        document.querySelectorAll('.admin-edit-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                openAdminEdit(parseInt(btn.dataset.editId));
-            });
-        });
+            document.getElementById('products-container').scrollIntoView({behavior:'smooth',block:'start'});
+        }));
     }
-    
+
     const searchInput = document.getElementById('search-input');
     searchInput.addEventListener('input', applyFilters);
     
     function applyFilters() {
         const searchTerm = searchInput.value.trim().toLowerCase();
-        const sections = document.querySelectorAll('.category-section');
-        let hasAnyVisible = false;
-        
-        sections.forEach(section => {
-            const sectionCat = section.dataset.category;
-            const cards = section.querySelectorAll('.product-card');
-            let sectionHasVisible = false;
-            const categoryMatch = (activeFilter === 'all' || sectionCat === activeFilter);
-            
-            cards.forEach(card => {
-                const text = card.dataset.searchText;
-                const searchMatch = (searchTerm === '' || text.includes(searchTerm));
-                if (categoryMatch && searchMatch) {
-                    card.classList.remove('hidden');
-                    sectionHasVisible = true;
-                    hasAnyVisible = true;
-                } else {
-                    card.classList.add('hidden');
-                }
+        document.querySelectorAll('.category-section').forEach(section => {
+            let visible = 0;
+            section.querySelectorAll('.product-card').forEach(card => {
+                const id = Number(card.dataset.id);
+                const p = products.find(x => x.id === id);
+                const matchesSearch = !searchTerm || (card.dataset.searchText || '').includes(searchTerm);
+                const matchesFilter = activeFilter === 'all' || (activeFilter === PROMO_FILTER ? !!p?.isPromo : activeFilter === 'wishlist' ? isWishlisted(id) : section.dataset.category === activeFilter);
+                const matchesFeature = !section.dataset.featureSection || activeFilter === 'all';
+                const show = matchesSearch && matchesFilter && matchesFeature;
+                card.classList.toggle('hidden', !show);
+                if (show) visible++;
             });
-            section.classList.toggle('hidden', !sectionHasVisible);
+            const isFeature = section.dataset.featureSection === 'true';
+            section.classList.toggle('hidden', visible === 0 || (activeFilter !== 'all' && isFeature));
         });
-        
-        const container = document.getElementById('products-container');
-        let noResultsMsg = container.querySelector('.no-results');
-        if (!hasAnyVisible) {
-            if (!noResultsMsg) {
-                noResultsMsg = document.createElement('div');
-                noResultsMsg.className = 'no-results';
-                noResultsMsg.textContent = 'No products found. Try a different search or filter.';
-                container.appendChild(noResultsMsg);
-            }
-        } else if (noResultsMsg) {
-            noResultsMsg.remove();
-        }
     }
-    
+
+    function updateMiniDashboard(){const promo=products.filter(p=>p.isPromo).length,fresh=products.filter(p=>p.isNew).length,best=products.filter(p=>p.isBestSeller).length,orders=orderHistory.length,vals={products:products.length,promo,new:fresh,best,orders};Object.entries(vals).forEach(([k,v])=>{const e=document.getElementById('dash-'+k);if(e)e.textContent=v;const m=document.getElementById('dash-modal-'+k);if(m)m.textContent=v});const f=document.getElementById('dash-modal-favorites');if(f)f.textContent=wishlist.length;const ci=cart.reduce((a,i)=>a+i.quantity,0),ct=cart.reduce((a,i)=>a+i.price*i.quantity,0),cie=document.getElementById('dash-modal-cart-items'),cte=document.getElementById('dash-modal-cart-total');if(cie)cie.textContent=ci;if(cte)cte.textContent='₱'+ct.toFixed(2)}
+    function openMiniDashboard(){updateMiniDashboard();document.getElementById('admin-dashboard-modal').classList.add('show')}
+
     function addToCart(id) {
         const product = products.find(p => p.id === id);
         if (!product) return;
@@ -1052,29 +1048,23 @@
     
     function updateCartDisplay() {
         const cartItems = document.getElementById('cart-items');
+        const floatingCart=document.getElementById('floating-cart'),floatingCount=document.getElementById('floating-cart-count'),floatingTotal=document.getElementById('floating-cart-total');
         const cartBreakdown = document.getElementById('cart-breakdown');
         const minimumNote = document.getElementById('minimum-note');
         const checkoutBtn = document.getElementById('checkout-btn');
         const cartBadge = document.getElementById('cart-count-badge');
-        const mobileCartCount = document.getElementById('mobile-cart-count');
-        const mobileCartTotal = document.getElementById('mobile-cart-total');
         
         cartItems.innerHTML = '';
         
-        const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-        if (totalItems > 0) {
-            cartBadge.style.display = 'flex'; cartBadge.textContent = totalItems;
-            mobileCartCount.style.display = 'flex'; mobileCartCount.textContent = totalItems;
-        } else {
-            cartBadge.style.display = 'none';
-            mobileCartCount.style.display = 'none';
-        }
+        const totalItems=cart.reduce((sum,item)=>sum+item.quantity,0),floatingSubtotal=cart.reduce((sum,item)=>sum+item.price*item.quantity,0);if(floatingCart)floatingCart.classList.toggle('show',totalItems>0);if(floatingCount)floatingCount.textContent=totalItems+(totalItems===1?' item':' items');if(floatingTotal)floatingTotal.textContent='₱'+floatingSubtotal.toFixed(2);
+        if (totalItems > 0) { cartBadge.style.display = 'flex'; cartBadge.textContent = totalItems; }
+        else { cartBadge.style.display = 'none'; }
         
         if (cart.length === 0) {
             cartItems.innerHTML = '<p class="empty-cart">Your cart is empty</p>';
             cartBreakdown.style.display = 'none';
-            mobileCartTotal.textContent = '0.00';
             checkoutBtn.disabled = false;
+            updateMiniDashboard();
             return;
         }
         
@@ -1111,7 +1101,6 @@
         document.getElementById('service-fee').textContent = serviceFee.toFixed(2);
         document.getElementById('delivery-fee').textContent = deliveryFee.toFixed(2);
         document.getElementById('total-price').textContent = grandTotal.toFixed(2);
-        mobileCartTotal.textContent = grandTotal.toFixed(2);
         
         if (subtotal < MINIMUM_ORDER) {
             minimumNote.style.display = 'flex';
@@ -1122,6 +1111,7 @@
             checkoutBtn.disabled = false;
         }
         
+        updateMiniDashboard();
         document.querySelectorAll('.qty-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -1138,15 +1128,6 @@
         saveCart();
     }
     
-    const stickyCart = document.getElementById('sticky-cart');
-    const mobileCartToggle = document.getElementById('mobile-cart-toggle');
-    if (stickyCart && mobileCartToggle) {
-        mobileCartToggle.addEventListener('click', () => {
-            const isOpen = stickyCart.classList.toggle('mobile-cart-open');
-            mobileCartToggle.setAttribute('aria-expanded', String(isOpen));
-        });
-    }
-
     const quickViewModal = document.getElementById('quick-view-modal');
     function openQuickView(id) {
         const product = products.find(p => p.id === id);
@@ -1179,7 +1160,9 @@
         document.body.classList.toggle('admin-mode', on);
         adminIndicator.style.display = on ? 'inline-block' : 'none';
         adminToolbar.classList.toggle('show', on);
+        document.getElementById('mini-dashboard').classList.toggle('show', on);
         adminBtn.innerHTML = on ? ADMIN_BTN_EXIT_HTML : ADMIN_BTN_LOGIN_HTML;
+        if (on) updateMiniDashboard();
     }
     
     adminBtn.addEventListener('click', () => {
@@ -1214,6 +1197,8 @@
         document.getElementById('edit-name').value = product.name;
         document.getElementById('edit-price').value = product.price;
         document.getElementById('edit-promo').checked = !!product.isPromo;
+        document.getElementById('edit-new').checked = !!product.isNew;
+        document.getElementById('edit-best').checked = !!product.isBestSeller;
         adminEditModal.classList.add('show');
     }
     document.getElementById('close-admin-edit').addEventListener('click', () => adminEditModal.classList.remove('show'));
@@ -1224,6 +1209,8 @@
         product.name = document.getElementById('edit-name').value.trim();
         product.price = parseFloat(document.getElementById('edit-price').value) || 0;
         product.isPromo = document.getElementById('edit-promo').checked;
+        product.isNew = document.getElementById('edit-new').checked;
+        product.isBestSeller = document.getElementById('edit-best').checked;
         saveProducts();
         renderProducts();
         updateCartDisplay();
@@ -1244,6 +1231,8 @@
         document.getElementById('add-price').value = '';
         document.getElementById('add-category').value = '';
         document.getElementById('add-promo').checked = false;
+        document.getElementById('add-new').checked = false;
+        document.getElementById('add-best').checked = false;
         document.getElementById('add-img').value = '';
         document.getElementById('add-error').style.display = 'none';
         adminAddModal.classList.add('show');
@@ -1255,12 +1244,14 @@
         const price = parseFloat(document.getElementById('add-price').value);
         const catKey = document.getElementById('add-category').value;
         const isPromo = document.getElementById('add-promo').checked;
+        const isNew = document.getElementById('add-new').checked;
+        const isBestSeller = document.getElementById('add-best').checked;
         const img = document.getElementById('add-img').value.trim();
         const err = document.getElementById('add-error');
         if (!name || !price || price <= 0 || !catKey) { err.style.display = 'block'; return; }
         const cat = CATEGORIES.find(c => c.key === catKey);
         const newId = products.reduce((m, p) => Math.max(m, p.id), 0) + 1;
-        products.push({ id: newId, name: name, price: price, category: catKey, catLabel: cat.label, img: img || PLACEHOLDER_IMG, isPromo: isPromo });
+        products.push({ id: newId, name: name, price: price, category: catKey, catLabel: cat.label, img: img || PLACEHOLDER_IMG, isPromo: isPromo, isNew: isNew, isBestSeller: isBestSeller });
         saveProducts();
         renderProducts();
         adminAddModal.classList.remove('show');
@@ -1272,7 +1263,7 @@
         if (wasAdmin) setAdminMode(false);
         let html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
         if (wasAdmin) setAdminMode(true);
-        const exportProducts = products.map(p => ({ id: p.id, name: p.name, price: p.price, category: p.category, catLabel: p.catLabel, img: p.img, isPromo: !!p.isPromo }));
+        const exportProducts = products.map(p => ({ id: p.id, name: p.name, price: p.price, category: p.category, catLabel: p.catLabel, img: p.img, isPromo: !!p.isPromo, isNew: !!p.isNew, isBestSeller: !!p.isBestSeller }));
         const arrStr = JSON.stringify(exportProducts, null, 4).replace(/</g, '\\u003c');
         html = html.replace(/const DEFAULT_PRODUCTS = \[[\s\S]*?\];/, 'const DEFAULT_PRODUCTS = ' + arrStr + ';');
         html = html.replace(/const PRODUCTS_VERSION = \d+;/, 'const PRODUCTS_VERSION = ' + Date.now() + ';');
@@ -1285,97 +1276,40 @@
         alert('Website file downloaded!\n\nNext steps:\n1. Go to your GitHub repo.\n2. Upload/replace the old HTML file with this new one.\n3. Wait ~1 minute for GitHub Pages to update.\nAll customers will then see your new products.');
     }
     
-    // Supabase cloud order helpers
-    async function saveOrderToCloud(order, items) {
-        const { data: created, error: orderError } = await supabaseClient
-            .from('orders')
-            .insert({
-                customer_name: order.fullname, address: order.address, phone: order.phone,
-                payment_method: order.payment, order_type: order.orderType,
-                location_key: order.location, location_name: order.locationName,
-                subtotal: order.subtotal, service_fee: order.serviceFee,
-                delivery_fee: order.deliveryFee, grand_total: order.grandTotal,
-                order_summary: currentOrderSummary
-            })
-            .select('id,order_no')
-            .single();
-        if (orderError) throw orderError;
-        const rows = items.map(i => ({
-            order_id: created.id, product_id: i.id, product_name: i.name,
-            unit_price: i.price, quantity: i.quantity, line_total: i.price * i.quantity
-        }));
-        const { error: itemError } = await supabaseClient.from('order_items').insert(rows);
-        if (itemError) throw itemError;
-        return created;
-    }
-
-    async function cloudAdminLogin() {
-        const email = prompt('Admin email:');
-        if (!email) return;
-        const password = prompt('Supabase admin password:');
-        if (!password) return;
-        const { error } = await supabaseClient.auth.signInWithPassword({ email: email.trim(), password });
-        if (error) { alert('Cloud Admin Login failed: ' + error.message); return; }
-        alert('Cloud Admin connected. Order History will now load from Supabase.');
-        renderOrderHistory();
-    }
-
-    async function cloudAdminLogout() {
-        await supabaseClient.auth.signOut();
-    }
-
-    async function fetchCloudOrders() {
-        const { data: orders, error } = await supabaseClient
-            .from('orders')
-            .select('id,order_no,customer_name,address,phone,payment_method,order_type,location_name,subtotal,service_fee,delivery_fee,grand_total,status,created_at,order_summary,order_items(product_name,unit_price,quantity,line_total)')
-            .order('created_at', { ascending: false });
-        if (error) throw error;
-        return orders || [];
-    }
-
     // Order History — admin only (button lives in admin toolbar)
     const historyModal = document.getElementById('history-modal');
     document.getElementById('admin-history-btn').addEventListener('click', renderOrderHistory);
-    document.getElementById('cloud-login-btn').addEventListener('click', cloudAdminLogin);
+    document.getElementById('admin-dashboard-btn').addEventListener('click', openMiniDashboard);
+    document.getElementById('close-admin-dashboard').addEventListener('click',()=>document.getElementById('admin-dashboard-modal').classList.remove('show'));
+    document.getElementById('floating-cart-btn').addEventListener('click',()=>{const c=document.querySelector('.sticky-cart');if(c)c.scrollIntoView({behavior:'smooth',block:'start'})});
     document.getElementById('close-history').addEventListener('click', () => historyModal.classList.remove('show'));
     document.getElementById('clear-history').addEventListener('click', () => {
         if (confirm('Are you sure you want to clear all order history?')) {
             orderHistory = []; saveOrderHistory(); renderOrderHistory();
         }
     });
-    async function renderOrderHistory() {
+    function renderOrderHistory() {
         const historyList = document.getElementById('history-list');
-        const { data: sessionData } = await supabaseClient.auth.getSession();
-        if (sessionData && sessionData.session) {
-            try {
-                const orders = await fetchCloudOrders();
-                if (!orders.length) {
-                    historyList.innerHTML = '<p class="history-empty">No cloud orders yet</p>';
-                } else {
-                    historyList.innerHTML = orders.map(order => {
-                        const items = (order.order_items || []).map(i => `${i.product_name} x${i.quantity} — ₱${Number(i.line_total).toFixed(2)}`).join('<br>');
-                        return `
-                          <div class="history-item">
-                            <div class="history-header"><span>Order #${order.order_no} — ${order.customer_name}</span><span class="history-total">₱${Number(order.grand_total).toFixed(2)}</span></div>
-                            <div class="history-date">${new Date(order.created_at).toLocaleString('en-PH')} · <strong>${order.status}</strong></div>
-                            <div class="history-details" style="margin-top:8px;">${items}<br><br>${order.address}<br>${order.phone} · ${order.payment_method}</div>
-                          </div>`;
-                    }).join('');
-                }
-            } catch (e) {
-                historyList.innerHTML = '<p class="history-empty">Cloud history error: ' + (e.message || 'Unknown error') + '</p>';
-            }
-        } else if (orderHistory.length === 0) {
-            historyList.innerHTML = '<p class="history-empty">No local order history. Use ☁️ Cloud Admin Login to view orders from all devices.</p>';
+        if (orderHistory.length === 0) {
+            historyList.innerHTML = '<p class="history-empty">No order history yet</p>';
         } else {
             historyList.innerHTML = orderHistory.slice().reverse().map((order, i) => {
                 const idx = orderHistory.length - 1 - i;
-                return `<div class="history-item"><div class="history-header"><span>Order #${idx + 1} &mdash; ${order.customer}</span><span class="history-total">${order.total}</span></div><div class="history-date">${order.date}</div><div class="history-details" style="margin-top:8px;">${order.summary}</div></div>`;
+                return `
+                    <div class="history-item">
+                        <div class="history-header">
+                            <span>Order #${idx + 1} &mdash; ${order.customer}</span>
+                            <span class="history-total">${order.total}</span>
+                        </div>
+                        <div class="history-date">${order.date}</div>
+                        <div class="history-details" style="margin-top:8px;">${order.summary}</div>
+                    </div>
+                `;
             }).join('');
         }
         historyModal.classList.add('show');
     }
-
+    
     const backToTopBtn = document.getElementById('back-to-top');
     window.addEventListener('scroll', () => { backToTopBtn.classList.toggle('show', window.scrollY > 300); });
     
@@ -1593,13 +1527,6 @@ Payment: ${payment}`;
             } catch (e) { console.log('Email error:', e); }
         }
         
-        try {
-            const cloudOrder = await saveOrderToCloud(o, cart);
-            currentOrderSummary = currentOrderSummary.replace('SUMMARY OF YOUR ORDER - K&A S&R PasaBUY', 'ORDER #' + cloudOrder.order_no + ' — K&A S&R PasaBUY');
-        } catch (e) {
-            console.error('Cloud order save failed:', e);
-            alert('Hindi na-save sa cloud ang order. Na-save pa rin locally at puwedeng i-send sa Messenger. Error: ' + (e.message || 'Unknown error'));
-        }
         orderHistory.push({ date: new Date().toLocaleString('en-PH'), customer: o.fullname, total: '₱' + o.grandTotal.toFixed(2), summary: currentOrderSummary });
         saveOrderHistory();
         
