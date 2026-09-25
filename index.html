@@ -300,6 +300,61 @@
         display: flex; align-items: center; gap: 8px;
     }
     .auto-copy-note svg { width: 18px; height: 18px; flex-shrink: 0; color: var(--success); }
+
+    .mobile-cart-toggle { display:none; }
+    @media (max-width: 900px) {
+        body { padding-bottom: 76px; }
+        .sticky-cart {
+            position: fixed;
+            left: 10px;
+            right: 10px;
+            bottom: 10px;
+            top: auto;
+            z-index: 1000;
+            max-height: 76vh;
+            transform: translateY(calc(100% - 62px));
+            transition: transform .22s ease, box-shadow .22s ease;
+            box-shadow: 0 8px 30px rgba(15,23,42,.20);
+            border-radius: 16px;
+            overflow: hidden;
+            background: #fff;
+        }
+        .sticky-cart.mobile-cart-open {
+            transform: translateY(0);
+            box-shadow: 0 12px 40px rgba(15,23,42,.28);
+        }
+        .sticky-cart .cart-section {
+            max-height: 76vh;
+            overflow-y: auto;
+            border-radius: 16px;
+        }
+        .mobile-cart-toggle {
+            display:flex;
+            position:sticky;
+            top:0;
+            z-index:2;
+            align-items:center;
+            justify-content:space-between;
+            gap:10px;
+            width:100%;
+            min-height:62px;
+            padding:10px 14px;
+            border:0;
+            border-bottom:1px solid var(--border);
+            background:#fff;
+            color:var(--text);
+            cursor:pointer;
+            font:inherit;
+        }
+        .mobile-cart-toggle .mcart-left { display:flex; align-items:center; gap:9px; font-weight:700; }
+        .mobile-cart-toggle .mcart-summary { display:flex; align-items:center; gap:8px; font-size:13px; color:var(--muted); }
+        .mobile-cart-toggle .mcart-total { color:var(--accent); font-weight:800; font-size:16px; }
+        .mobile-cart-toggle .mcart-arrow { font-size:18px; transition:transform .2s ease; }
+        .sticky-cart.mobile-cart-open .mcart-arrow { transform:rotate(180deg); }
+        .sticky-cart .cart-section > .section-title { display:none; }
+        .sticky-cart .cart-section { padding-top:0; }
+        .sticky-cart .checkout-btn { position:sticky; bottom:0; margin-bottom:0; }
+    }
     
     .gcash-info { display: none; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 12px; margin-top: 8px; }
     .gcash-info.show { display: block; }
@@ -412,8 +467,19 @@
                 <div id="products-container"></div>
             </div>
             
-            <div class="sticky-cart">
+            <div class="sticky-cart" id="sticky-cart">
                 <div class="cart-section">
+                    <button class="mobile-cart-toggle" id="mobile-cart-toggle" type="button" aria-expanded="false">
+                        <span class="mcart-left">
+                            <span aria-hidden="true">🛒</span>
+                            <span>My Cart</span>
+                            <span class="cart-count-badge" id="mobile-cart-count">0</span>
+                        </span>
+                        <span class="mcart-summary">
+                            <span class="mcart-total">₱<span id="mobile-cart-total">0.00</span></span>
+                            <span class="mcart-arrow" aria-hidden="true">⌃</span>
+                        </span>
+                    </button>
                     <div class="section-title" style="font-size:18px;margin-bottom:14px;">
                         <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--accent);width:20px;height:20px;">
                             <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/>
@@ -990,16 +1056,24 @@
         const minimumNote = document.getElementById('minimum-note');
         const checkoutBtn = document.getElementById('checkout-btn');
         const cartBadge = document.getElementById('cart-count-badge');
+        const mobileCartCount = document.getElementById('mobile-cart-count');
+        const mobileCartTotal = document.getElementById('mobile-cart-total');
         
         cartItems.innerHTML = '';
         
         const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-        if (totalItems > 0) { cartBadge.style.display = 'flex'; cartBadge.textContent = totalItems; }
-        else { cartBadge.style.display = 'none'; }
+        if (totalItems > 0) {
+            cartBadge.style.display = 'flex'; cartBadge.textContent = totalItems;
+            mobileCartCount.style.display = 'flex'; mobileCartCount.textContent = totalItems;
+        } else {
+            cartBadge.style.display = 'none';
+            mobileCartCount.style.display = 'none';
+        }
         
         if (cart.length === 0) {
             cartItems.innerHTML = '<p class="empty-cart">Your cart is empty</p>';
             cartBreakdown.style.display = 'none';
+            mobileCartTotal.textContent = '0.00';
             checkoutBtn.disabled = false;
             return;
         }
@@ -1037,6 +1111,7 @@
         document.getElementById('service-fee').textContent = serviceFee.toFixed(2);
         document.getElementById('delivery-fee').textContent = deliveryFee.toFixed(2);
         document.getElementById('total-price').textContent = grandTotal.toFixed(2);
+        mobileCartTotal.textContent = grandTotal.toFixed(2);
         
         if (subtotal < MINIMUM_ORDER) {
             minimumNote.style.display = 'flex';
@@ -1063,6 +1138,15 @@
         saveCart();
     }
     
+    const stickyCart = document.getElementById('sticky-cart');
+    const mobileCartToggle = document.getElementById('mobile-cart-toggle');
+    if (stickyCart && mobileCartToggle) {
+        mobileCartToggle.addEventListener('click', () => {
+            const isOpen = stickyCart.classList.toggle('mobile-cart-open');
+            mobileCartToggle.setAttribute('aria-expanded', String(isOpen));
+        });
+    }
+
     const quickViewModal = document.getElementById('quick-view-modal');
     function openQuickView(id) {
         const product = products.find(p => p.id === id);
