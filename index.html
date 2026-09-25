@@ -118,6 +118,11 @@
     .product-card.hidden, .category-section.hidden { display: none; }
     
     .category-section { margin-bottom: 36px; }
+    .promo-section { padding: 18px; margin: 0 0 30px 0; border: 2px solid #f97316; border-radius: 18px; background: linear-gradient(135deg,#fff7ed 0%,#fff 55%,#fffbeb 100%); box-shadow: 0 8px 24px rgba(249,115,22,.12); }
+    .promo-section .category-heading { color: #c2410c; }
+    .promo-badge { display:inline-flex; align-items:center; gap:4px; padding:4px 9px; margin-bottom:8px; border-radius:999px; background:#ea580c; color:#fff; font-size:11px; font-weight:800; }
+    .promo-filter-btn { border-color:#f97316 !important; color:#c2410c !important; font-weight:700; }
+    .promo-filter-btn.active { background:#ea580c !important; color:#fff !important; }
     .category-heading {
         font-size: 18px; font-weight: 700; color: var(--accent); margin-bottom: 12px;
         padding-bottom: 6px; border-bottom: 2px solid var(--accent-soft);
@@ -586,6 +591,7 @@
             <h3 style="margin:0 0 20px 0;color:var(--purple);text-align:center;font-size:20px;">Edit Product</h3>
             <div class="form-group"><label for="edit-name">Product Name</label><input type="text" id="edit-name"></div>
             <div class="form-group"><label for="edit-price">Price (₱)</label><input type="number" id="edit-price" step="0.01" min="0"></div>
+            <div class="form-group"><label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:600;"><input type="checkbox" id="edit-promo" style="width:auto;"> 🔥 Promo Buy 1 Take 1</label></div>
             <div style="display:flex;gap:10px;">
                 <button class="delete-btn-inline" id="edit-delete">Delete</button>
                 <button class="cancel-btn" id="edit-cancel">Cancel</button>
@@ -601,6 +607,7 @@
             <div class="form-group"><label for="add-name">Product Name *</label><input type="text" id="add-name" placeholder="e.g. Pringles Original (149g)"></div>
             <div class="form-group"><label for="add-price">Price (₱) *</label><input type="number" id="add-price" step="0.01" min="0" placeholder="e.g. 108"></div>
             <div class="form-group"><label for="add-category">Category *</label><select id="add-category"></select></div>
+            <div class="form-group"><label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:600;"><input type="checkbox" id="add-promo" style="width:auto;"> 🔥 Promo Buy 1 Take 1</label></div>
             <div class="form-group">
                 <label for="add-img">Image URL (optional)</label>
                 <input type="url" id="add-img" placeholder="https://... direct link to product photo">
@@ -632,7 +639,7 @@
     const EMAILJS_TEMPLATE_ID = 'template_vmi3ypn';
     const ADMIN_PASSWORD_HASH = '90bfe04ee5921f0c7ce8a50352eea54456b39dc24ad69e6c393f2ae23012ca27';
     
-    const PRODUCTS_VERSION = 1;
+    const PRODUCTS_VERSION = 2;
     const SERVICE_FEE_RATE = 0.10;
     const MINIMUM_ORDER = 500;
     
@@ -689,7 +696,7 @@
         { id: 21, name: "Prem Luncheon Meat Lite (340g)", price: 184, category: "pantry", catLabel: "Pantry Essentials", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR3Tz8ofa-w5o2Byj7HiEZW29MDvQi10Cgi9EKzHvaY_g&s=10" },
         { id: 22, name: "Prem Luncheon Meat Regular (340g)", price: 184, category: "pantry", catLabel: "Pantry Essentials", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQNP5G1_XQQFrYWNEg0tEdEqS_hUR6-Mqbfi9XTGaa5RQ&s=10" },
         { id: 23, name: "Spam Regular (340g)", price: 224, category: "pantry", catLabel: "Pantry Essentials", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTEKjaJXlhwXss7WVjySBgwKTDFlqmrfbB8HaFeX7gevQ&s=10" },
-        { id: 24, name: "Ring Cake Buy 1 Take 1", price: 379, category: "bakery", catLabel: "Bakery & Treats", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTfeesZC-NxruXKQephChcAcYOqL4lbiA8cWpRftCJiNw&s=10" },
+        { id: 24, name: "Ring Cake Buy 1 Take 1", price: 379, category: "bakery", catLabel: "Bakery & Treats", isPromo: true, img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTfeesZC-NxruXKQephChcAcYOqL4lbiA8cWpRftCJiNw&s=10" },
         { id: 25, name: "Keror Sparkling Red Grape (750mL)", price: 192, category: "alcohol", catLabel: "Beverages & Spirits", img: "https://www.snrshopping.com/upload/product/Keror-Sparkling-Red-Grape-750mL-11706/Keror%20Sparkling%20Red%20Grape%20750mL-O5k7nPujHu.png" },
         { id: 26, name: "Chivas Regal 12 YO Scotch Whiskey (1L)", price: 849, category: "alcohol", catLabel: "Beverages & Spirits", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRWTmUYxdr-ikJEOBGrHCJOfi96YmV3li14MYZpQGwMTw&s=10" },
         { id: 27, name: "John Jameson Irish Whiskey (1L)", price: 799, category: "alcohol", catLabel: "Beverages & Spirits", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQgcWqNq1ADP6GilcSTz9q9kKyugUajs3hzzkjbIGw3bQ&s=10" },
@@ -766,7 +773,7 @@
         { id: 98, name: "Pantene 3-Minute Miracle (480mL)", price: 399, category: "personalcare", catLabel: "Personal Care", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRWW83yuGk_zNr72TYduGIhy7Gim-1PnsPza9uQU4YQ7Q&s=10" },
         { id: 99, name: "Colgate Triple Action (226g)", price: 169, category: "personalcare", catLabel: "Personal Care", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSxMQ5qoZsFsdky4guaG737CB1lzTjFoUR1czoiLpzKtg&s=10" },
         { id: 100, name: "Colgate Spicy Fresh (4x173g)", price: 309, category: "personalcare", catLabel: "Personal Care", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR7_z4xm36gUTLiQIOyySiBzH5FtNaGI9HHq48D-YFGNQ&s=10" },
-        { id: 101, name: "S&R Muffins Buy 1 Take 1", price: 379, category: "bakery", catLabel: "Bakery & Treats", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQG3yEqB3KCIcyWxZishAUQRb0uis0-3SDe7snm4_o8mQ&s=10" },
+        { id: 101, name: "S&R Muffins Buy 1 Take 1", price: 379, category: "bakery", catLabel: "Bakery & Treats", isPromo: true, img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQG3yEqB3KCIcyWxZishAUQRb0uis0-3SDe7snm4_o8mQ&s=10" },
         { id: 102, name: "Member's Value Laundry Detergent Powder Floral (7KG)", price: 599, category: "household", catLabel: "Laundry Soaps & Detergents", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR_7802RTRdGBHe1nrpUUFdyJOFi3bLa-w-2Tm0wSaw_A&s=10" },
         { id: 103, name: "Member's Value Liquid Laundry Detergent (2.5L Pouch)", price: 274, category: "household", catLabel: "Laundry Soaps & Detergents", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ8B3S0vccyUW0wATcmoF4hmXEjN1C_n-gGfCpsCRxi1w&s=10" },
         { id: 104, name: "Member's Value Dishwashing Lemon Pouch (2.5L Pouch)", price: 199, category: "household", catLabel: "Laundry Soaps & Detergents", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTM0iL-EdETt9yS05qZTQvqoulPZs858pgCyXVVNWPwnw&s=10" },
@@ -780,9 +787,9 @@
         { id: 112, name: "Milk Classic Rice Cracker Milk Flavor (240g)", price: 149, category: "snacks", catLabel: "Snacks & Treats", img: "https://www.snrshopping.com/upload/product/Milk-Classic-Rice-Cracker-Milk-Flavor-240g-14999/Milk%20Classic%20Rice%20Cracker%20Milk%20Flavor%20240g-UTxcPMJalK.png" },
         { id: 113, name: "Maltesers Fun Size (144g)", price: 222, category: "snacks", catLabel: "Snacks & Treats", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR--UfbRMkHNhie5BfRHpIfFatgfiZzKeEbyras6VVS8Q&s=10" },
         { id: 114, name: "Maltesers Bucket (565g)", price: 539, category: "snacks", catLabel: "Snacks & Treats", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSrZpUcUrbr7KBtAkpAo-pGMXgsU21OGEJ_NsmkZoKuXA&s=10" },
-        { id: 115, name: "Finca Andrade Malbec Buy 1 Take 1 (750ML)", price: 499, category: "alcohol", catLabel: "Beverages & Spirits", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSO91FEzyiOYyt6t4knnx2wYTrk3khTN4pUsQepfVpCog&s=10" },
+        { id: 115, name: "Finca Andrade Malbec Buy 1 Take 1 (750ML)", price: 499, category: "alcohol", catLabel: "Beverages & Spirits", isPromo: true, img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSO91FEzyiOYyt6t4knnx2wYTrk3khTN4pUsQepfVpCog&s=10" },
         { id: 116, name: "Neocell Super Collagen Peptides (600MG)", price: 1599, category: "personalcare", catLabel: "Personal Care", img: "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcRoE7e7Z8OXYT8mnXrin_m5WRrrA5W-bnlqIrKUBey07kmptVNRYoZmJOULXVXHqrJYFDSZ6w7yLAuYtPwvu2lHjxfgQ3wcLmQxXH4ljnsIqUjIXJqX9VquGg_fzTrMq4dsanJ0QQ&usqp=CAc" },
-        { id: 117, name: "Cheertalk Sunflower Seeds (350G)", price: 99, category: "snacks", catLabel: "Snacks & Treats", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSrZpUcUrbr7KBtAkpAo-pGMXgsU21OGEJ_NsmkZoKuXA&s=10" },
+        { id: 117, name: "Cheertalk Sunflower Seeds (350G)", price: 99, category: "snacks", catLabel: "Snacks & Treats", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcREsw_c4VpUz2YLiQM0ODRhlCIcEGjjXMu0XbTHq-uwjg&s=10" },
         { id: 118, name: "Southern Valley Whole Corn Kernel (1KG)", price: 149, category: "snacks", catLabel: "Snacks & Treats", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQVxZceCOH7uuwbkLyExqOuZXJBFyaRNH0bbqxR28Wxgw&s" }
     ];
     
@@ -798,6 +805,9 @@
     } catch(e) {
         products = DEFAULT_PRODUCTS.map(p => ({ ...p }));
     }
+
+    // Mark existing Buy 1 Take 1 items as promos and keep saved products compatible.
+    products = products.map(p => ({ ...p, isPromo: p.isPromo === true || /buy\s*1\s*take\s*1/i.test(p.name || '') }));
     
     function saveProducts() {
         try {
@@ -835,9 +845,11 @@
     let currentEditId = null;
     
     const categoryOrder = CATEGORIES.map(c => c.label);
+    const PROMO_FILTER = 'promo-buy-1-take-1';
     
     const filterContainer = document.getElementById('category-filters');
     filterContainer.innerHTML = `<button class="filter-btn active" data-filter="all">All Products</button>` +
+        `<button class="filter-btn promo-filter-btn" data-filter="${PROMO_FILTER}">🔥 Promo Buy 1 Take 1</button>` +
         categoryOrder.map(cat => `<button class="filter-btn" data-filter="${cat.toLowerCase()}">${cat}</button>`).join('');
     
     filterContainer.querySelectorAll('.filter-btn').forEach(btn => {
@@ -855,49 +867,47 @@
     
     function renderProducts() {
         const groupedProducts = {};
-        products.forEach(p => {
-            if (!groupedProducts[p.catLabel]) groupedProducts[p.catLabel] = [];
-            groupedProducts[p.catLabel].push(p);
-        });
-        
+        products.forEach(p => { if (!groupedProducts[p.catLabel]) groupedProducts[p.catLabel] = []; groupedProducts[p.catLabel].push(p); });
         const container = document.getElementById('products-container');
         container.innerHTML = '';
-        
+
+        const promoItems = products.filter(p => p.isPromo);
+        if (promoItems.length) {
+            const promoSection = document.createElement('div');
+            promoSection.className = 'category-section promo-section';
+            promoSection.dataset.category = PROMO_FILTER;
+            promoSection.innerHTML = `
+                <h3 class="category-heading"><span>🔥 Promo Buy 1 Take 1</span><span style="font-size:12px;color:var(--muted);font-weight:500;">(${promoItems.length} items)</span></h3>
+                <div class="category-items">${promoItems.map(product => `
+                    <div class="product-card" data-search-text="${(product.name+' '+product.catLabel+' buy 1 take 1').toLowerCase()}" data-id="${product.id}">
+                        <button class="admin-edit-btn" data-edit-id="${product.id}" title="Edit Product">&#9998;</button>
+                        <img src="${product.img}" alt="${product.name}" loading="lazy" onerror="this.style.visibility='hidden'" class="product-img" data-img-id="${product.id}">
+                        <div class="quick-view-overlay" data-qv-id="${product.id}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>Quick View</div>
+                        <span class="promo-badge">🔥 BUY 1 TAKE 1</span>
+                        <span class="category-chip cat-${product.category}">${product.catLabel}</span>
+                        <div class="product-name">${product.name}</div><div class="price-tag">₱${product.price.toFixed(2)}</div>
+                        <button class="add-btn" data-id="${product.id}">Add to Cart</button>
+                    </div>`).join('')}</div>`;
+            container.appendChild(promoSection);
+        }
+
         categoryOrder.forEach(catLabel => {
             if (!groupedProducts[catLabel]) return;
             const items = groupedProducts[catLabel];
-            const section = document.createElement('div');
-            section.className = 'category-section';
-            section.dataset.category = catLabel.toLowerCase();
-            
-            section.innerHTML = `
-                <h3 class="category-heading">
-                    <span>${catLabel}</span>
-                    <span style="font-size:12px;color:var(--muted);font-weight:500;">(${items.length} items)</span>
-                </h3>
-                <div class="category-items">
-                    ${items.map(product => `
-                        <div class="product-card" data-search-text="${(product.name + ' ' + product.catLabel).toLowerCase()}" data-id="${product.id}">
-                            <button class="admin-edit-btn" data-edit-id="${product.id}" title="Edit Product">&#9998;</button>
-                            <img src="${product.img}" alt="${product.name}" loading="lazy" onerror="this.style.visibility='hidden'" class="product-img" data-img-id="${product.id}">
-                            <div class="quick-view-overlay" data-qv-id="${product.id}">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                                Quick View
-                            </div>
-                            <span class="category-chip cat-${product.category}">${product.catLabel}</span>
-                            <div class="product-name">${product.name}</div>
-                            <div class="price-tag">₱${product.price.toFixed(2)}</div>
-                            <button class="add-btn" data-id="${product.id}">Add to Cart</button>
-                        </div>
-                    `).join('')}
-                </div>
-            `;
+            const section = document.createElement('div'); section.className='category-section'; section.dataset.category=catLabel.toLowerCase();
+            section.innerHTML = `<h3 class="category-heading"><span>${catLabel}</span><span style="font-size:12px;color:var(--muted);font-weight:500;">(${items.length} items)</span></h3><div class="category-items">${items.map(product => `
+                <div class="product-card" data-search-text="${(product.name+' '+product.catLabel).toLowerCase()}" data-id="${product.id}">
+                    <button class="admin-edit-btn" data-edit-id="${product.id}" title="Edit Product">&#9998;</button>
+                    <img src="${product.img}" alt="${product.name}" loading="lazy" onerror="this.style.visibility='hidden'" class="product-img" data-img-id="${product.id}">
+                    <div class="quick-view-overlay" data-qv-id="${product.id}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>Quick View</div>
+                    ${product.isPromo ? '<span class="promo-badge">🔥 BUY 1 TAKE 1</span>' : ''}
+                    <span class="category-chip cat-${product.category}">${product.catLabel}</span><div class="product-name">${product.name}</div><div class="price-tag">₱${product.price.toFixed(2)}</div>
+                    <button class="add-btn" data-id="${product.id}">Add to Cart</button>
+                </div>`).join('')}</div>`;
             container.appendChild(section);
         });
-        
         document.getElementById('product-count').textContent = products.length;
-        attachProductEventListeners();
-        applyFilters();
+        attachProductEventListeners(); applyFilters();
     }
     
     function attachProductEventListeners() {
@@ -1114,6 +1124,7 @@
         currentEditId = id;
         document.getElementById('edit-name').value = product.name;
         document.getElementById('edit-price').value = product.price;
+        document.getElementById('edit-promo').checked = !!product.isPromo;
         adminEditModal.classList.add('show');
     }
     document.getElementById('close-admin-edit').addEventListener('click', () => adminEditModal.classList.remove('show'));
@@ -1123,6 +1134,7 @@
         if (!product) return;
         product.name = document.getElementById('edit-name').value.trim();
         product.price = parseFloat(document.getElementById('edit-price').value) || 0;
+        product.isPromo = document.getElementById('edit-promo').checked;
         saveProducts();
         renderProducts();
         updateCartDisplay();
@@ -1142,6 +1154,7 @@
         document.getElementById('add-name').value = '';
         document.getElementById('add-price').value = '';
         document.getElementById('add-category').value = '';
+        document.getElementById('add-promo').checked = false;
         document.getElementById('add-img').value = '';
         document.getElementById('add-error').style.display = 'none';
         adminAddModal.classList.add('show');
@@ -1152,12 +1165,13 @@
         const name = document.getElementById('add-name').value.trim();
         const price = parseFloat(document.getElementById('add-price').value);
         const catKey = document.getElementById('add-category').value;
+        const isPromo = document.getElementById('add-promo').checked;
         const img = document.getElementById('add-img').value.trim();
         const err = document.getElementById('add-error');
         if (!name || !price || price <= 0 || !catKey) { err.style.display = 'block'; return; }
         const cat = CATEGORIES.find(c => c.key === catKey);
         const newId = products.reduce((m, p) => Math.max(m, p.id), 0) + 1;
-        products.push({ id: newId, name: name, price: price, category: catKey, catLabel: cat.label, img: img || PLACEHOLDER_IMG });
+        products.push({ id: newId, name: name, price: price, category: catKey, catLabel: cat.label, img: img || PLACEHOLDER_IMG, isPromo: isPromo });
         saveProducts();
         renderProducts();
         adminAddModal.classList.remove('show');
@@ -1169,7 +1183,7 @@
         if (wasAdmin) setAdminMode(false);
         let html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
         if (wasAdmin) setAdminMode(true);
-        const exportProducts = products.map(p => ({ id: p.id, name: p.name, price: p.price, category: p.category, catLabel: p.catLabel, img: p.img }));
+        const exportProducts = products.map(p => ({ id: p.id, name: p.name, price: p.price, category: p.category, catLabel: p.catLabel, img: p.img, isPromo: !!p.isPromo }));
         const arrStr = JSON.stringify(exportProducts, null, 4).replace(/</g, '\\u003c');
         html = html.replace(/const DEFAULT_PRODUCTS = \[[\s\S]*?\];/, 'const DEFAULT_PRODUCTS = ' + arrStr + ';');
         html = html.replace(/const PRODUCTS_VERSION = \d+;/, 'const PRODUCTS_VERSION = ' + Date.now() + ';');
