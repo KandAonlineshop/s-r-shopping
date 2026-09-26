@@ -215,6 +215,7 @@
         cursor: pointer; font-size: 14px; font-weight: 600; transition: all 0.15s; margin-top: auto;
     }
     .add-btn:hover { background: var(--accent); color: #fff; }
+    .add-btn:disabled { opacity: .55; cursor: not-allowed; }
     
     .cart-section {
         background: var(--card); border: 1px solid var(--border); border-radius: 14px;
@@ -442,7 +443,7 @@
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
                     </svg>
-                    <span><strong>Note:</strong> Prices shown are from S&R and may vary without prior notice. A <strong>10% service fee</strong> will be added to your total. Minimum order is <strong>₱500</strong>.</span>
+                    <span><strong>Note:</strong> Prices shown are from S&R and may vary without prior notice. Orders below <strong>₱500</strong> have a minimum <strong>₱50 service fee</strong>. Orders of <strong>₱500 and above</strong> have a <strong>10% service fee</strong>.</span>
                 </div>
                 
                 <div class="delivery-notice">
@@ -474,7 +475,7 @@
                     <div id="cart-items"><p class="empty-cart">Your cart is empty</p></div>
                     <div class="cart-breakdown" id="cart-breakdown" style="display:none;">
                         <div class="breakdown-row subtotal"><span>Subtotal:</span><span>₱<span id="subtotal-price">0.00</span></span></div>
-                        <div class="breakdown-row service-fee"><span>Service Fee (10%):</span><span>₱<span id="service-fee">0.00</span></span></div>
+                        <div class="breakdown-row service-fee"><span id="service-fee-label">Service Fee:</span><span>₱<span id="service-fee">0.00</span></span></div>
                         <div class="breakdown-row delivery-fee"><span id="delivery-fee-label">Delivery Fee:</span><span>₱<span id="delivery-fee">0.00</span></span></div>
                         <div class="breakdown-row grand-total"><span>Grand Total:</span><span>₱<span id="total-price">0.00</span></span></div>
                         <div class="breakdown-row minimum-note" id="minimum-note" style="display:none;"></div>
@@ -698,9 +699,10 @@
     const EMAILJS_TEMPLATE_ID = 'template_vmi3ypn';
     const ADMIN_PASSWORD_HASH = '90bfe04ee5921f0c7ce8a50352eea54456b39dc24ad69e6c393f2ae23012ca27';
     
-    const PRODUCTS_VERSION = 3;
+    const PRODUCTS_VERSION = 4;
     const SERVICE_FEE_RATE = 0.10;
-    const MINIMUM_ORDER = 500;
+    const MINIMUM_SERVICE_FEE = 50;
+    const SERVICE_FEE_THRESHOLD = 500;
     
     const DELIVERY_FEES = {
         'nearby': 30, 'san-nicolas': 30, 'sto-cristo-norte': 30,
@@ -732,16 +734,16 @@
     }
     
     const DEFAULT_PRODUCTS = [
-        { id: 1, name: "Pringles Original (149g)", price: 108, isBestSeller: true, category: "snacks", catLabel: "Snacks & Treats", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTS9Oub4AIrHQb7gPUT8-yyVZkOw-LTGKcNI6OfnLO8Lg&s=10" },
+        { id: 1, name: "Pringles Original (149g)", price: 108, category: "snacks", catLabel: "Snacks & Treats", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTS9Oub4AIrHQb7gPUT8-yyVZkOw-LTGKcNI6OfnLO8Lg&s=10" },
         { id: 2, name: "Meiji Choco Baby (102g)", price: 159, category: "snacks", catLabel: "Snacks & Treats", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRdR8WLxEMm-z3xvG2BIhs5tbzoHQGROvcEPSrbuZf5qg&s=10" },
         { id: 3, name: "Toblerone Tiny (200g)", price: 239, category: "snacks", catLabel: "Snacks & Treats", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRvnxNTLnTeRF489Rm9Yhf466MzXHcjY8vQ-Lf6OGS5dg&s=10" },
         { id: 4, name: "Pik-Nik Original (396g)", price: 235, category: "snacks", catLabel: "Snacks & Treats", img: "https://www.snrshopping.com/upload/product_details/5fa8ffc5689ee_1604911045.jpg" },
-        { id: 5, name: "Samyang Hot Chicken Ramen", price: 84, isBestSeller: true, category: "pantry", catLabel: "Pantry Essentials", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcREKX9h2-ZFt_atvZkkHL0YRkxn3MftVrotrRmKx_AJyQ&s=10" },
+        { id: 5, name: "Samyang Hot Chicken Ramen", price: 84, category: "pantry", catLabel: "Pantry Essentials", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcREKX9h2-ZFt_atvZkkHL0YRkxn3MftVrotrRmKx_AJyQ&s=10" },
         { id: 6, name: "Samyang Buldak Swicy (105g)", price: 84, category: "pantry", catLabel: "Pantry Essentials", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQvFtvVNOwXSFKS1ToiFfgaH6lBfA5yegI2pAn0oXXSiA&s=10" },
         { id: 7, name: "Samyang Hot Chicken Cheese Bowl (105g)", price: 84, category: "pantry", catLabel: "Pantry Essentials", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS7ZvdV41OItKYlN456BvAHHvqqB9WPOq2iRGQRXjddww&s=10" },
         { id: 8, name: "Samyang Hot Chicken Carbonara Bowl (105g)", price: 84, category: "pantry", catLabel: "Pantry Essentials", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSIuIj9GlTVkCnn9ZRHnUNJng76UiHAyCA71gr5KyJHVQ&s=10" },
         { id: 9, name: "Lotte Luncheon Meat (340g)", price: 134, category: "pantry", catLabel: "Pantry Essentials", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQrvdj7RBy-9hpxDeT8c_VQRCxkRvfCw7bdFQCqYqxCNg&s=10" },
-        { id: 10, name: "Member's Value Hazelnut Spread with Cocoa (1kg)", price: 399, isNew: true, category: "pantry", catLabel: "Pantry Essentials", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRCCz0SS_z4iUOZaC9E-yEIR0lqQ1KTT6CmUicRspLAsQ&s=10" },
+        { id: 10, name: "Member's Value Hazelnut Spread with Cocoa (1kg)", price: 399, category: "pantry", catLabel: "Pantry Essentials", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRCCz0SS_z4iUOZaC9E-yEIR0lqQ1KTT6CmUicRspLAsQ&s=10" },
         { id: 11, name: "Member's Value Real Mayonnaise (1L)", price: 279, category: "pantry", catLabel: "Pantry Essentials", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ9aIbs8r_gLzu2_n2dcbqjiVDoKj6c5pbXwDdfzqveMw&s=10" },
         { id: 12, name: "Member's Value All Purpose Dressing (1L)", price: 175, category: "pantry", catLabel: "Pantry Essentials", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQg65a_8Igu2gYnGGwTS-1MXo0aJOIaCnAI2o8ITGLSxA&s=10" },
         { id: 13, name: "Heinz Tomato Ketchup (1.25kg)", price: 299, category: "pantry", catLabel: "Pantry Essentials", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRXXS0oTDDLjyl4P7mTeStstdpSuzLPgaZWcHx9sPoeTA&s=10" },
@@ -848,9 +850,16 @@
         { id: 114, name: "Maltesers Bucket (565g)", price: 539, category: "snacks", catLabel: "Snacks & Treats", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSrZpUcUrbr7KBtAkpAo-pGMXgsU21OGEJ_NsmkZoKuXA&s=10" },
         { id: 115, name: "Finca Andrade Malbec Buy 1 Take 1 (750ML)", price: 499, category: "alcohol", catLabel: "Beverages & Spirits", isPromo: true, img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSO91FEzyiOYyt6t4knnx2wYTrk3khTN4pUsQepfVpCog&s=10" },
         { id: 116, name: "Neocell Super Collagen Peptides (600MG)", price: 1599, category: "personalcare", catLabel: "Personal Care", img: "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcRoE7e7Z8OXYT8mnXrin_m5WRrrA5W-bnlqIrKUBey07kmptVNRYoZmJOULXVXHqrJYFDSZ6w7yLAuYtPwvu2lHjxfgQ3wcLmQxXH4ljnsIqUjIXJqX9VquGg_fzTrMq4dsanJ0QQ&usqp=CAc" },
-        { id: 117, name: "Cheertalk Sunflower Seeds (350G)", price: 99, category: "snacks", catLabel: "Snacks & Treats", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcREsw_c4VpUz2YLiQM0ODRhlCIcEGjjXMu0XbTHq-uwjg&s=10" },
-        { id: 118, name: "Southern Valley Whole Corn Kernel (1KG)", price: 149, category: "snacks", catLabel: "Snacks & Treats", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQVxZceCOH7uuwbkLyExqOuZXJBFyaRNH0bbqxR28Wxgw&s" },
-	{ id: 119, name: "Nutella Hazelnut Spread (900G)", price: 654, isBestSeller: true, category: "pantry", catLabel: "Pantry Essentials", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTxFnUTt0rtUEYY7DioYyce1B2XAt-uDbm-K6rfNpPL9Q&s=10" },
+        { id: 117, name: "Cheertalk Sunflower Seeds (350G)", price: 99, outOfStock: true, category: "snacks", catLabel: "Snacks & Treats", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcREsw_c4VpUz2YLiQM0ODRhlCIcEGjjXMu0XbTHq-uwjg&s=10" },
+        { id: 118, name: "Southern Valley Whole Corn Kernel (1KG)", price: 149, isBestSeller: true, category: "snacks", catLabel: "Snacks & Treats", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQVxZceCOH7uuwbkLyExqOuZXJBFyaRNH0bbqxR28Wxgw&s" },
+	{ id: 119, name: "Nutella Hazelnut Spread (900G)", price: 654, category: "pantry", catLabel: "Pantry Essentials", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTxFnUTt0rtUEYY7DioYyce1B2XAt-uDbm-K6rfNpPL9Q&s=10" },
+	{ id: 120, name: "Surf Professional Rose Fresh Laundry Powner (9.00KG)", price: 1149, category: "household", catLabel: "Laundry Soaps & Detergents", img: "https://www.snrshopping.com/upload/product/Surf-Professional-Rose-Fresh-Laundry-Powder-9kg-5829/Surf%20Professional%20Rose%20Fresh%20Laundry%20Powder%209kg-wduBkN1dt4.jpg" },
+	{ id: 121, name: "Antabax Anti-Bacterial Bar Soap 6+2(110G)", price: 239, category: "personalcare", catLabel: "Personal Care", img: "https://www.snrshopping.com/upload/product/Antabax-Antibacterial-Fresh-Derma-Protect-Bar-Soap-6pcs-1569/Antabax%20Antibacterial%20Fresh%20Derma%20Protect%20Bar%20Soap%206pcs-vuxMyQDiRP.jpg" },
+	{ id: 122, name: "Dove Bar White 6pcs(3.75OZ)", price: 399, category: "personalcare", catLabel: "Personal Care", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSYR4c1C3wqM1MV-j7tezhkMHDetNcrkwuzsEebYaSrRQ&s=10" },
+	{ id: 123, name: "Olay Bar Soap Shea Butter 6pcs(90G)", price: 599, category: "personalcare", catLabel: "Personal Care", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTkXr9NPlwgxl82cFN-E0XtD_Xdscm-OKxvHPPq6kBxmQ&s=10" },
+	{ id: 124, name: "Safeguard Bar Soap Pure White 6pcs(115G)", price: 269, category: "personalcare", catLabel: "Personal Care", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTmT58Q7lJDh-y-o0_alV4W-GrGcoRaHNlDnXcotPrdTw&s=10" },
+	{ id: 125, name: "Cetaphil Deep Cleansing Bar Soap (127G)", price: 374, category: "personalcare", catLabel: "Personal Care", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSqSLa3cV6_5VkbiJnIkCpt-jyvfvh33XBbGIiM_Vg2Bg&s=10" },
+	
 	
 	
     ];
@@ -869,7 +878,7 @@
     }
 
     // Mark existing Buy 1 Take 1 items as promos and keep saved products compatible.
-    products = products.map(p => ({ ...p, isPromo: p.isPromo === true || /buy\s*1\s*take\s*1/i.test(p.name || ''), isNew: p.isNew === true, isBestSeller: p.isBestSeller === true }));
+    products = products.map(p => ({ ...p, isPromo: p.isPromo === true || /buy\s*1\s*take\s*1/i.test(p.name || ''), isNew: p.isNew === true, isBestSeller: p.isBestSeller === true, outOfStock: p.outOfStock === true }));
     
     function saveProducts() {
         try {
@@ -955,10 +964,10 @@
             </div>
             <img src="${product.img}" alt="${product.name}" loading="lazy" onerror="this.style.visibility='hidden'" class="product-img" data-img-id="${product.id}">
             <div class="quick-view-overlay" data-qv-id="${product.id}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>Quick View</div>
-            <div>${product.isPromo ? '<span class="status-badge promo-badge">🔥 BUY 1 TAKE 1</span>' : ''}${product.isNew ? '<span class="status-badge new-badge">🆕 NEW</span>' : ''}${product.isBestSeller ? '<span class="status-badge best-badge">⭐ BEST SELLER</span>' : ''}</div>
+            <div>${product.isPromo ? '<span class="status-badge promo-badge">🔥 BUY 1 TAKE 1</span>' : ''}${product.isNew ? '<span class="status-badge new-badge">🆕 NEW</span>' : ''}${product.isBestSeller ? '<span class="status-badge best-badge">⭐ BEST SELLER</span>' : ''}${product.outOfStock ? '<span class="status-badge">🚫 OUT OF STOCK</span>' : ''}</div>
             <span class="category-chip cat-${product.category}">${product.catLabel}</span>
             <div class="product-name">${product.name}</div><div class="price-tag">₱${product.price.toFixed(2)}</div>
-            <button class="add-btn" data-id="${product.id}">Add to Cart</button>
+            <button class="add-btn" data-id="${product.id}" ${product.outOfStock ? 'disabled' : ''}>${product.outOfStock ? 'Out of Stock' : 'Add to Cart'}</button>
         </div>`;
     }
 
@@ -1042,7 +1051,7 @@
 
     function addToCart(id) {
         const product = products.find(p => p.id === id);
-        if (!product) return;
+        if (!product || product.outOfStock) return;
         const existing = cart.find(item => item.id === id);
         if (existing) existing.quantity += 1;
         else cart.push({ ...product, quantity: 1 });
@@ -1093,7 +1102,8 @@
             cartItems.appendChild(div);
         });
         
-        const serviceFee = subtotal * SERVICE_FEE_RATE;
+        const serviceFee = subtotal >= SERVICE_FEE_THRESHOLD ? subtotal * SERVICE_FEE_RATE : MINIMUM_SERVICE_FEE;
+        const serviceFeeLabel = document.getElementById('service-fee-label');
         const deliveryFee = (orderType === 'pickup') ? 0 : (selectedLocation ? (DELIVERY_FEES[selectedLocation] || 0) : 0);
         const grandTotal = subtotal + serviceFee + deliveryFee;
         
@@ -1102,17 +1112,12 @@
         cartBreakdown.style.display = 'block';
         document.getElementById('subtotal-price').textContent = subtotal.toFixed(2);
         document.getElementById('service-fee').textContent = serviceFee.toFixed(2);
+        if (serviceFeeLabel) serviceFeeLabel.textContent = subtotal >= SERVICE_FEE_THRESHOLD ? 'Service Fee (10%):' : 'Service Fee (₱50 minimum):';
         document.getElementById('delivery-fee').textContent = deliveryFee.toFixed(2);
         document.getElementById('total-price').textContent = grandTotal.toFixed(2);
         
-        if (subtotal < MINIMUM_ORDER) {
-            minimumNote.style.display = 'flex';
-            minimumNote.innerHTML = `Add &#8369;${(MINIMUM_ORDER - subtotal).toFixed(2)} more to reach minimum order of &#8369;${MINIMUM_ORDER}`;
-            checkoutBtn.disabled = true;
-        } else {
-            minimumNote.style.display = 'none';
-            checkoutBtn.disabled = false;
-        }
+        minimumNote.style.display = 'none';
+        checkoutBtn.disabled = false;
         
         updateMiniDashboard();
         document.querySelectorAll('.qty-btn').forEach(btn => {
@@ -1140,6 +1145,9 @@
         document.getElementById('qv-img').alt = product.name;
         document.getElementById('qv-name').textContent = product.name;
         document.getElementById('qv-price').textContent = '₱' + product.price.toFixed(2);
+        const qvAdd = document.getElementById('qv-add-cart');
+        qvAdd.disabled = product.outOfStock === true;
+        qvAdd.textContent = product.outOfStock ? 'Out of Stock' : 'Add to Cart';
         const catEl = document.getElementById('qv-category');
         catEl.textContent = product.catLabel;
         catEl.className = 'quick-view-category cat-' + product.category;
@@ -1266,7 +1274,7 @@
         if (wasAdmin) setAdminMode(false);
         let html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
         if (wasAdmin) setAdminMode(true);
-        const exportProducts = products.map(p => ({ id: p.id, name: p.name, price: p.price, category: p.category, catLabel: p.catLabel, img: p.img, isPromo: !!p.isPromo, isNew: !!p.isNew, isBestSeller: !!p.isBestSeller }));
+        const exportProducts = products.map(p => ({ id: p.id, name: p.name, price: p.price, category: p.category, catLabel: p.catLabel, img: p.img, isPromo: !!p.isPromo, isNew: !!p.isNew, isBestSeller: !!p.isBestSeller, outOfStock: !!p.outOfStock }));
         const arrStr = JSON.stringify(exportProducts, null, 4).replace(/</g, '\\u003c');
         html = html.replace(/const DEFAULT_PRODUCTS = \[[\s\S]*?\];/, 'const DEFAULT_PRODUCTS = ' + arrStr + ';');
         html = html.replace(/const PRODUCTS_VERSION = \d+;/, 'const PRODUCTS_VERSION = ' + Date.now() + ';');
@@ -1419,7 +1427,7 @@
     checkoutBtn.addEventListener('click', () => {
         if (cart.length === 0) { alert('Your cart is empty!'); return; }
         const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-        if (subtotal < MINIMUM_ORDER) { alert(`Minimum order is ₱${MINIMUM_ORDER}.`); return; }
+        
         infoModal.classList.add('show');
         hideAllErrors();
     });
@@ -1444,7 +1452,8 @@
         if (!isValid) return;
         
         const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-        const serviceFee = subtotal * SERVICE_FEE_RATE;
+        const serviceFee = subtotal >= SERVICE_FEE_THRESHOLD ? subtotal * SERVICE_FEE_RATE : MINIMUM_SERVICE_FEE;
+        const serviceFeeText = subtotal >= SERVICE_FEE_THRESHOLD ? 'Service Fee (10%)' : 'Service Fee (₱50 minimum)';
         const deliveryFee = (orderType === 'pickup') ? 0 : (DELIVERY_FEES[location] || 0);
         const grandTotal = subtotal + serviceFee + deliveryFee;
         const locationName = (orderType === 'pickup') ? 'Pick-up' : (DELIVERY_LOCATION_NAMES[location] || location);
@@ -1456,7 +1465,7 @@
 ${orderList}
 ----------------------------------------
 Subtotal: ₱${subtotal.toFixed(2)}
-Service Fee (10%): ₱${serviceFee.toFixed(2)}
+${serviceFeeText}: ₱${serviceFee.toFixed(2)}
 ${orderType === 'pickup' ? 'Pick-up Fee: ₱0.00 (FREE)' : `Delivery Fee (${locationName}): ₱${deliveryFee.toFixed(2)}`}
 GRAND TOTAL: ₱${grandTotal.toFixed(2)}
 ----------------------------------------
@@ -1494,7 +1503,7 @@ Payment: ${payment}`;
             ${itemsHtml}
             <div style="margin-top:10px;padding-top:10px;border-top:2px solid var(--border);font-size:13px;">
                 <div style="display:flex;justify-content:space-between;color:var(--muted);padding:2px 0;"><span>Subtotal</span><span>₱${subtotal.toFixed(2)}</span></div>
-                <div style="display:flex;justify-content:space-between;color:var(--accent2);padding:2px 0;"><span>Service Fee (10%)</span><span>₱${serviceFee.toFixed(2)}</span></div>
+                <div style="display:flex;justify-content:space-between;color:var(--accent2);padding:2px 0;"><span>${serviceFeeText}</span><span>₱${serviceFee.toFixed(2)}</span></div>
                 <div style="display:flex;justify-content:space-between;color:var(--purple);padding:2px 0;"><span>${orderType === 'pickup' ? 'Pick-up Fee' : 'Delivery Fee'}</span><span>₱${deliveryFee.toFixed(2)}</span></div>
                 <div style="display:flex;justify-content:space-between;font-weight:700;font-size:17px;color:var(--accent);padding-top:8px;border-top:1px solid var(--border);margin-top:6px;"><span>Grand Total</span><span>₱${grandTotal.toFixed(2)}</span></div>
             </div>
